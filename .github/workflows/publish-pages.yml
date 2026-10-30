@@ -1,0 +1,50 @@
+name: Publish NodeUse learning site
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'assets/**'
+      - 'learn/**'
+      - 'task_entry/**'
+      - 'all_task/**'
+      - 'sitemap.xml'
+      - 'robots.txt'
+      - '.nojekyll'
+      - '.github/workflows/publish-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout NodeUse
+        uses: actions/checkout@v4
+      - name: Assemble only static GitHub Pages files
+        run: |
+          mkdir -p site
+          cp index.html sitemap.xml robots.txt .nojekyll site/
+          cp -R assets learn task_entry all_task site/
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload static site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
