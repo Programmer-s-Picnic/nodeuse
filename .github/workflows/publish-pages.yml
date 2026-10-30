@@ -13,6 +13,7 @@ on:
       - 'sitemap.xml'
       - 'robots.txt'
       - '.nojekyll'
+      - 'CNAME'
       - '.github/workflows/publish-pages.yml'
   workflow_dispatch:
 
@@ -37,7 +38,7 @@ jobs:
       - name: Assemble only static GitHub Pages files
         run: |
           mkdir -p site
-          cp index.html sitemap.xml robots.txt .nojekyll site/
+          cp index.html sitemap.xml robots.txt .nojekyll CNAME site/
           cp -R assets learn task_entry all_task site/
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
