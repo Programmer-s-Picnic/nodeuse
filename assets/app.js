@@ -4,7 +4,7 @@
   "use strict";
   const TASK_KEY = "pp-nodeuse-tasks-v1";
   const API_KEY = "pp-nodeuse-api-v1";
-  const PROGRESS_KEY = "pp-node-godaddy-course-v1";
+  const PROGRESS_KEY = "pp-node-godaddy-course-v2";
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 
