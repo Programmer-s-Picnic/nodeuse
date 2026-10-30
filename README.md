@@ -65,7 +65,7 @@ This learning backend contains **public, read-only GET examples**. It does not u
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, OPTIONS
 Access-Control-Allow-Headers: Content-Type
-X-NodeUse-API-Version: 2026-10-30-cors-fix
+X-NodeUse-API-Version: 2026-10-30-jsonp-fallback
 ```
 
 **Important:** This wildcard CORS policy is only for public demos. Build a strict origin policy and real authentication/authorization before creating APIs for user accounts, private tasks or credentials. CORS alone is not authentication.
@@ -75,9 +75,13 @@ X-NodeUse-API-Version: 2026-10-30-cors-fix
 1. In GoDaddy, select the **nodeuse** app and click **Update Preview** to deploy the current `main` branch.
 2. Verify the preview's `/health` or `/api/diagnostics` response if your GoDaddy session allows it.
 3. Click **Publish to Live**.
-4. Open the published `https://11vhaiejwu.c39.airoapp.ai/api/diagnostics` directly. The JSON should include `"apiVersion":"2026-10-30-cors-fix"` and `"allowOrigin":"*"`.
+4. Open the published `https://11vhaiejwu.c39.airoapp.ai/api/diagnostics` directly. The JSON should include `"apiVersion":"2026-10-30-jsonp-fallback"` and `"allowOrigin":"*"`.
 5. Open `https://11vhaiejwu.c39.airoapp.ai/api/hello` and verify `"connected":true`.
 6. In the GitHub Pages lesson, click **Reset URL** then **Connect & test**. If direct JSON works but browser fetch fails, inspect the response's CORS header, HTTPS certificate and any GoDaddy proxy redirects.
+
+### CORS-free fallback for public lessons
+
+The GitHub Pages lesson first uses normal `fetch`. If the browser blocks it because the GoDaddy proxy strips CORS headers, the course can call the same public GET examples using JSONP (`?callback=__nodeuse_jsonp_...`). This returns executable JavaScript and **must not** be used with authentication, cookies, secrets, personal data, user-specific responses, or any untrusted backend. JSONP only works after the current NodeUse backend release is published; it cannot repair an unreachable URL.
 
 To check CORS from a terminal:
 
@@ -86,7 +90,7 @@ curl -i -H "Origin: https://nodeuse.learnwithchampak.live" \
   https://11vhaiejwu.c39.airoapp.ai/api/hello
 ```
 
-The response must include `Access-Control-Allow-Origin: *`.
+The response should include `Access-Control-Allow-Origin: *` if GoDaddy forwards it. If it does not, inspect the proxy and use the public-only JSONP practice fallback until the proxy headers are fixed.
 
 Do not put preview sharing tokens in lesson URLs or public repository files.
 
