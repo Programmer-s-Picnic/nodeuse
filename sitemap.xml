@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://programmer-s-picnic.github.io/nodeuse/</loc><lastmod>2026-10-30</lastmod></url>
-  <url><loc>https://programmer-s-picnic.github.io/nodeuse/learn/</loc><lastmod>2026-10-30</lastmod></url>
-  <url><loc>https://programmer-s-picnic.github.io/nodeuse/task_entry/</loc><lastmod>2026-10-30</lastmod></url>
-  <url><loc>https://programmer-s-picnic.github.io/nodeuse/all_task/</loc><lastmod>2026-10-30</lastmod></url>
+  <url><loc>http://nodeuse.learnwithchampak.live/</loc><lastmod>2026-10-30</lastmod></url>
+  <url><loc>http://nodeuse.learnwithchampak.live/learn/</loc><lastmod>2026-10-30</lastmod></url>
+  <url><loc>http://nodeuse.learnwithchampak.live/task_entry/</loc><lastmod>2026-10-30</lastmod></url>
+  <url><loc>http://nodeuse.learnwithchampak.live/all_task/</loc><lastmod>2026-10-30</lastmod></url>
 </urlset>
