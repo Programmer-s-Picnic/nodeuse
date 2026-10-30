@@ -178,7 +178,7 @@
     const submit = $("#connect-api");
     if (!input || !submit) return;
     const saved = read(API_KEY, "");
-    if (typeof saved === "string") input.value = saved || "https://cserver.learnwithchampak.live";
+    if (typeof saved === "string") input.value = saved || "https://11vhaiejwu.c39.airoapp.ai";
     const status = $("#api-status");
     const response = $("#api-response");
     function show(state, line) {
@@ -221,9 +221,9 @@
       } finally { clearTimeout(timeout); submit.disabled = false; }
     });
     $("#api-reset")?.addEventListener("click", () => {
-      input.value = "https://cserver.learnwithchampak.live";
+      input.value = "https://11vhaiejwu.c39.airoapp.ai";
       try { localStorage.removeItem(API_KEY); } catch {}
-      show("idle", "Hosting address shown for testing; connection not verified.");
+      show("idle", "GoDaddy published-app hostname shown for testing; connection not verified.");
       response.textContent = "Click Connect & test after publishing NodeUse on the selected GoDaddy URL.";
     });
   }
