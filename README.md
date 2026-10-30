@@ -1,16 +1,46 @@
-# NodeUse — Hello World Node.js server for GoDaddy
+# NodeUse — Node.js on GoDaddy, from 0 to Infinity
 
-This is the **server-side** half of Programmer's Picnic's [Node.js from 0 to Infinity course](https://programmer-s-picnic.github.io/taskmanager/learn/) and its [Task Manager frontend](https://programmer-s-picnic.github.io/taskmanager/).
+**One repository for the whole project.**
 
-The intended hosting account is `cserver.learnwithchampak.live`. Its actual app URL must be mapped and published through GoDaddy before it can be treated as live.
+- **GitHub Pages frontend (after enabling Pages):** https://programmer-s-picnic.github.io/nodeuse/
+- **Complete 13-chapter 0 → ∞ course:** https://programmer-s-picnic.github.io/nodeuse/learn/
+- **GitHub source (frontend + backend):** https://github.com/Programmer-s-Picnic/nodeuse
+- **Intended GoDaddy backend host:** https://cserver.learnwithchampak.live (verify actual app mapping after publishing)
 
-## Files
+## Project structure
 
-- `index.js`: HTTP server using only Node built-ins (no Express)
-- `package.json`: required `build` and `start` scripts
-- `index.test.js`: Node built-in test runner checks
+```text
+nodeuse/
+├── index.js                # GoDaddy Node.js HTTP server (backend)
+├── package.json            # GoDaddy build and start scripts
+├── index.test.js           # API tests
+├── index.html              # GitHub Pages frontend home
+├── assets/
+│   ├── app.js              # Frontend task and connection logic
+│   └── site.css            # Light-blue theme
+├── task_entry/index.html   # Browser task form
+├── all_task/index.html     # Task list / CRUD user interface
+└── learn/index.html        # Node.js on GoDaddy 0 to Infinity course
+```
 
-## Run locally (Node 22)
+## Step 1: Enable GitHub Pages
+
+In this **nodeuse** repository open **Settings → Pages**. Select **Deploy from a branch**, **main**, **/(root)**, then save.
+
+The public address will be https://programmer-s-picnic.github.io/nodeuse/ after GitHub Pages publishes.
+
+GitHub Pages serves static HTML/CSS/JavaScript from the repository; it does **not** execute `index.js`.
+
+## Step 2: Deploy backend on GoDaddy
+
+1. In the GoDaddy hosting dashboard for `cserver.learnwithchampak.live`, find **Node.js Apps → Add App**.
+2. Connect the **nodeuse** GitHub repository or upload a ZIP containing `index.js` and `package.json` at the ZIP root.
+3. Build command: `npm run build`; start command: `npm start`. The server listens on `process.env.PORT`.
+4. Preview, then publish. Use the **actual public HTTPS address** assigned/mapped by GoDaddy.
+5. Check endpoints: `/` (Hello World), `/api/hello` (JSON), `/health` (JSON health).
+6. Go to the GitHub Pages frontend, enter the published GoDaddy base URL in the connection tester, and click **Connect & test**. The suggested hostname is not proof the backend is live.
+
+## Run and test locally (Node.js 22)
 
 ```bash
 npm run build
@@ -18,37 +48,14 @@ npm test
 npm start
 ```
 
-Open http://localhost:3000/
+Check http://localhost:3000/, http://localhost:3000/health, and http://localhost:3000/api/hello.
 
-## Public endpoints
+## Frontend behavior
 
-| Endpoint | Method | Description |
-| --- | --- | --- |
-| `/` | GET | Plain text Hello World |
-| `/api/hello` | GET | JSON greeting including `connected:true` |
-| `/health` | GET | Basic JSON status |
+The home, Task Entry and All Tasks pages provide local task management. **Tasks are currently stored in the browser's localStorage only**; the NodeUse backend is a read-only Hello World API. Tasks do not sync across computers. The full course explains next steps to build a protected, durable REST API.
 
-Unknown paths return JSON `404`. Non-GET requests return `405`.
+## CORS and security
 
-## Deploy to GoDaddy
-
-1. In GoDaddy's hosting dashboard, open **Node.js Apps → Add App**.
-2. Connect GitHub to **Programmer-s-Picnic/nodeuse**, if that is available, or upload a ZIP containing the files at its root. Do not include an extra containing folder.
-3. Confirm that the `build` and `start` scripts run; GoDaddy sets `process.env.PORT`.
-4. Verify all endpoints in the private preview.
-5. Publish to a public HTTPS app address. The frontend uses the actual published base URL and does not assume that your hosting account hostname is the app URL.
-
-## CORS
-
-Allowed origins default to:
-- `https://programmer-s-picnic.github.io`
-- `http://localhost:5500`
-- `http://127.0.0.1:5500`
-
-Override with the `ALLOWED_ORIGINS` environment variable (comma-separated origin values). Do not include URL paths. CORS does not provide user authentication.
-
-## Security and next lessons
-
-This starter API is read-only. It does **not** save tasks and should not be described as a multi-device task database. Future task APIs should add server-side validation, authentication, authorization and a durable SQL database before allowing public mutations.
+The backend permits the GitHub Pages **origin** `https://programmer-s-picnic.github.io` (without `/nodeuse/`), plus local development origins. An `ALLOWED_ORIGINS` environment variable can override this list. CORS is not authentication. Do not place private keys, SQL connection strings or secrets in GitHub Pages or public code.
 
 Developed and maintained by Champak Roy.
