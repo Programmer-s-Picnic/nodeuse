@@ -3,7 +3,7 @@
    "Test on GoDaddy" makes a genuine request to the configured API and reports failure honestly. */
 (() => {
   "use strict";
-  const DEFAULT_API = "https://11vhaiejwu.c39.airoapp.ai";
+  const DEFAULT_API = "https://snode.learnwithchampak.live";
   const KEY = "pp-nodeuse-api-v1";
   const get = (object, key) => object[key];
   const numeric = (data, key) => {
@@ -79,7 +79,7 @@
       if (typeof saved === "string" && saved.trim()) {
         const url = new URL(saved);
         // GoDaddy previews are private and unusable from a public Pages site.
-        if (url.hostname !== "11vhaiejwu.preview.c39.airoapp.ai" &&
+        if (url.hostname !== "11vhaiejwu.preview.c39.airoapp.ai" && url.hostname !== "11vhaiejwu.c39.airoapp.ai" &&
             !url.search && !url.hash && (url.protocol === "https:" ||
             (url.protocol === "http:" && ["localhost", "127.0.0.1"].includes(url.hostname))))
           return url.origin;
@@ -124,7 +124,14 @@
           try {
             const response = await fetch(url.href, { signal: controller.signal, cache: "no-store", credentials: "omit" });
             const type = response.headers.get("content-type") || "";
-            if (!type.includes("application/json")) throw Error("The server returned a non-JSON page.");
+            if (!type.includes("application/json")) {
+              const bodyText = await response.text();
+              if (bodyText.trim() === "Hello Champak") {
+                show("Stage 1 GoDaddy server responded:", "Hello Champak\n\nThis lesson's dedicated API route is not yet implemented. Use Run in browser for the calculation.");
+                return;
+              }
+              throw Error("The server returned non-JSON content.");
+            }
             const body = await response.json();
             if (!response.ok) throw Error(body.error || "HTTP " + response.status);
             show("GoDaddy API using normal fetch (HTTP " + response.status + "):", body);
