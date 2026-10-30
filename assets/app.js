@@ -178,7 +178,7 @@
     const submit = $("#connect-api");
     if (!input || !submit) return;
     const saved = read(API_KEY, "");
-    if (typeof saved === "string") input.value = saved || "https://11vhaiejwu.c39.airoapp.ai";
+    if (typeof saved === "string") input.value = (!saved || saved === "https://11vhaiejwu.c39.airoapp.ai") ? "https://11vhaiejwu.preview.c39.airoapp.ai" : saved;
     const status = $("#api-status");
     const response = $("#api-response");
     function show(state, line) {
@@ -215,15 +215,15 @@
         response.textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2);
       } catch (error) {
         const message = error.name === "AbortError" ? "Request timed out." :
-          "Could not read the GoDaddy API. Check its published URL, HTTPS, browser CORS policy and server status.";
+          "Could not read the GoDaddy API. Check the preview URL, GoDaddy preview access, HTTPS, browser CORS policy and server status.";/
         show("error", message);
         response.textContent = String(error.message || error);
       } finally { clearTimeout(timeout); submit.disabled = false; }
     });
     $("#api-reset")?.addEventListener("click", () => {
-      input.value = "https://11vhaiejwu.c39.airoapp.ai";
+      input.value = "https://11vhaiejwu.preview.c39.airoapp.ai";
       try { localStorage.removeItem(API_KEY); } catch {}
-      show("idle", "GoDaddy published-app hostname shown for testing; connection not verified.");
+      show("idle", "GoDaddy preview API configured; connection not verified. Preview access may require a GoDaddy session.");
       response.textContent = "Click Connect & test after publishing NodeUse on the selected GoDaddy URL.";
     });
   }
