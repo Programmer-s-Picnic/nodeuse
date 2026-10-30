@@ -29,7 +29,7 @@ a,button{overflow-wrap:anywhere}
 <div class="wrap section">
 <section class="card" id="ch0"><div class="course-intro"><div>
 <h2>How to learn</h2><p>Each lesson has a tiny program, explanation, expected output, a practice challenge, a question, and the next lesson. Copy code and experiment with different values.</p>
-<p><strong>Two kinds of practice:</strong> <em>Run in browser</em> calculates locally and works without GoDaddy; <em>Test on GoDaddy</em> makes a real API call. The preview server may require login, so API connectivity is never simulated.</p>
+<p><strong>Two kinds of practice:</strong> <em>Run in browser</em> calculates locally and works without GoDaddy; <em>Test on GoDaddy</em> makes a real API call. The published API must be reachable from this site; API connectivity is never simulated.</p>
 </div><div><strong>Progress</strong><p data-progress-count>0 / 20 chapters</p><progress id="course-progress" value="0" max="20"></progress>
 <p class="muted smalltext">Mark lessons complete as you go. Progress is kept in this browser.</p>
 <div class="lesson-note"><strong>Where the code lives</strong><p>One repository: <a href="https://github.com/Programmer-s-Picnic/nodeuse" target="_blank" rel="noopener">Programmer-s-Picnic/nodeuse</a>. GitHub Pages hosts this lesson; GoDaddy executes the Node.js server.</p></div></div></div></section>
@@ -294,7 +294,7 @@ http.createServer((req, res) =&gt; {
 <h2 style="margin-top:13px">16. Fetch Data from Node.js</h2>
 <p>fetch() makes an HTTP request. We check response.ok and parse JSON. The frontend needs the exact API hostname and permission to read cross-origin responses.</p>
 <h3>Code — copy, change and run</h3>
-<div class="codebox"><div class="codehead"><strong>JavaScript / Node.js</strong><button type="button" data-copy="code-16">Copy code</button></div><pre id="code-16"><code>const api = &quot;https://11vhaiejwu.preview.c39.airoapp.ai&quot;;
+<div class="codebox"><div class="codehead"><strong>JavaScript / Node.js</strong><button type="button" data-copy="code-16">Copy code</button></div><pre id="code-16"><code>const api = &quot;https://11vhaiejwu.c39.airoapp.ai&quot;;
 async function sayHello() {
   const response = await fetch(api + &quot;/api/hello&quot;);
   if (!response.ok) throw Error(&quot;HTTP &quot; + response.status);
@@ -315,7 +315,7 @@ sayHello();</code></pre></div>
 <p>An HTML form collects values. Build a URL with URLSearchParams to safely encode those values before calling the Node.js API.</p>
 <h3>Code — copy, change and run</h3>
 <div class="codebox"><div class="codehead"><strong>JavaScript / Node.js</strong><button type="button" data-copy="code-17">Copy code</button></div><pre id="code-17"><code>const values = new URLSearchParams({ a: &quot;5&quot;, b: &quot;10&quot; });
-const api = &quot;https://11vhaiejwu.preview.c39.airoapp.ai&quot;;
+const api = &quot;https://11vhaiejwu.c39.airoapp.ai&quot;;
 fetch(api + &quot;/api/add?&quot; + values)
   .then(res =&gt; res.json())
   .then(data =&gt; console.log(data.result));</code></pre></div>
@@ -379,11 +379,11 @@ console.log(tasks);</code></pre></div>
 <details id="quiz20"><summary>Knowledge check: Why must a public task API check authorization?</summary><p>To ensure each user can only view or change tasks they are permitted to access.</p><button class="button small" type="button" data-share="#quiz20">Share this question</button></details>
 <div class="course-footer"><div class="buttons" style="margin-top:0"><a class="button" href="#ch19">← Previous</a><a class="button primary" href="#try-connection">Connection lab →</a></div><div class="buttons" style="margin-top:0"><a href="https://editor.learnwithchampak.live/" target="_blank" rel="noopener" class="button small">Our code editor</a><button type="button" class="button small" data-share="#ch20">Share chapter</button><a class="button small" target="_blank" rel="noopener" href="https://wa.me/?text=Infinity%3A%20REST%20API%20and%20Database%20%E2%80%94%20http%3A%2F%2Fnodeuse.learnwithchampak.live%2Flearn%2F%23ch20">WhatsApp</a><button type="button" class="button small" data-mark-complete>Mark chapter complete</button></div></div>
 </section>
-<section class="card" id="try-connection"><span class="tag">Real backend connection lab</span><h2>Connect your GoDaddy preview</h2>
-<p>The practice buttons use the preview API below. Your selected GoDaddy preview URL is prefilled, but access from a public GitHub Pages site may fail if GoDaddy requires authentication. Never share or commit a preview token. For a production public course, connect to the published GoDaddy API instead.</p>
-<div class="api-line"><div class="form-field"><label for="api-url">GoDaddy API base URL</label><input type="url" id="api-url" placeholder="https://11vhaiejwu.preview.c39.airoapp.ai" autocomplete="url"></div><button id="connect-api" type="button" class="button primary">Connect &amp; test</button><button id="api-reset" type="button" class="button">Reset URL</button></div>
-<div id="api-status" class="api-status" role="status" data-state="idle">Preview address selected; connection not yet verified.</div><pre class="terminal" id="api-response">Test /api/hello on the GoDaddy preview.</pre>
-<div class="buttons"><a href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/index.js" class="button" target="_blank" rel="noopener">View all backend routes</a><a class="button" href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/index.test.js" target="_blank" rel="noopener">View automated tests</a><a class="button" href="https://editor.learnwithchampak.live/" target="_blank" rel="noopener">Our code editor</a></div></section>
+<section class="card" id="try-connection"><span class="tag">Real backend connection lab</span><h2>Connect to your published GoDaddy API</h2>
+<p>The practice buttons use the <strong>published</strong> GoDaddy Node.js API below. GoDaddy preview links are private and can block public browser requests. To update the server, click <strong>Update Preview</strong> and then <strong>Publish to Live</strong> in GoDaddy. Do not include any preview sharing token.</p>
+<div class="api-line"><div class="form-field"><label for="api-url">GoDaddy API base URL</label><input type="url" id="api-url" placeholder="https://11vhaiejwu.c39.airoapp.ai" autocomplete="url"></div><button id="connect-api" type="button" class="button primary">Connect &amp; test</button><button id="api-reset" type="button" class="button">Reset URL</button></div>
+<div id="api-status" class="api-status" role="status" data-state="idle">Published API address selected; connection not yet verified.</div><pre class="terminal" id="api-response">Test /api/hello on the published GoDaddy app.</pre>
+<div class="buttons"><a class="button primary" href="https://11vhaiejwu.c39.airoapp.ai/api/hello" target="_blank" rel="noopener">Open API directly</a><a class="button" href="https://11vhaiejwu.c39.airoapp.ai/health" target="_blank" rel="noopener">Open health check</a><a href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/index.js" class="button" target="_blank" rel="noopener">View all backend routes</a><a class="button" href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/index.test.js" target="_blank" rel="noopener">View automated tests</a><a class="button" href="https://editor.learnwithchampak.live/" target="_blank" rel="noopener">Our code editor</a></div></section>
 </main><aside class="course-toc"><div class="card"><strong>Lessons · 1 → 20</strong><a href="#ch1">1. Hello World</a>
 <a href="#ch2">2. Hello Name</a>
 <a href="#ch3">3. Add 2 Numbers</a>
