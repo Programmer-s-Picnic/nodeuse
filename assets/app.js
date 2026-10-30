@@ -231,7 +231,7 @@
         const body = await result.text();
         if (body.trim() === "Hello Champak") {
           show("ok", "Connected: GoDaddy Node.js server responded Hello Champak.");
-          response.textContent = "Hello Champak\n\nStage 1 server is working. Dedicated JSON routes for Hello Name and Add Two Numbers will be added in later lessons.";
+          response.textContent = "Hello Champak\n\nHello Name is now available at /?name=Sunny. The Add Two Numbers and JSON APIs will be introduced later.";
         } else if (type.includes("application/json")) {
           const data = JSON.parse(body);
           if (!data || data.connected !== true) throw Error("Unexpected JSON API response.");
