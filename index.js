@@ -145,7 +145,7 @@ const server = http.createServer((req, res) => {
   if (url.pathname === "/api/hello") {
     return sendJSON(res, 200, {
       connected: true, message: "Hello World! GitHub Pages is connected to Node.js on GoDaddy.",
-      source: "GoDaddy Node.js", lesson: "0 to Infinity", timestamp: new Date().toISOString()
+      source: "GoDaddy Node.js", lesson: "0 to Infinity", apiVersion: API_VERSION, timestamp: new Date().toISOString()
     });
   }
   try {
