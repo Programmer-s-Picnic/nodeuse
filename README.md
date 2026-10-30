@@ -57,9 +57,38 @@ Check http://localhost:3000/, http://localhost:3000/health, http://localhost:300
 
 The home, Task Entry and All Tasks pages provide local task management. **Tasks are currently stored in the browser's localStorage only**; the NodeUse backend is a read-only Hello World API. Tasks do not sync across computers. The full course explains next steps to build a protected, durable REST API.
 
-## CORS and security
+## CORS, direct API links and deployment checks
 
-The backend permits the custom GitHub Pages **origins** `http://nodeuse.learnwithchampak.live` and `https://nodeuse.learnwithchampak.live`, the default `https://programmer-s-picnic.github.io` origin, and local development origins. An `ALLOWED_ORIGINS` environment variable can override this list. CORS is not authentication. Do not place private keys, SQL connection strings or secrets in GitHub Pages or public code.
+This learning backend contains **public, read-only GET examples**. It does not use accounts, cookies, private user data or privileged writes. Its responses now include:
+
+```http
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, OPTIONS
+Access-Control-Allow-Headers: Content-Type
+X-NodeUse-API-Version: 2026-10-30-cors-fix
+```
+
+**Important:** This wildcard CORS policy is only for public demos. Build a strict origin policy and real authentication/authorization before creating APIs for user accounts, private tasks or credentials. CORS alone is not authentication.
+
+### Verify the published GoDaddy app
+
+1. In GoDaddy, select the **nodeuse** app and click **Update Preview** to deploy the current `main` branch.
+2. Verify the preview's `/health` or `/api/diagnostics` response if your GoDaddy session allows it.
+3. Click **Publish to Live**.
+4. Open the published `https://11vhaiejwu.c39.airoapp.ai/api/diagnostics` directly. The JSON should include `"apiVersion":"2026-10-30-cors-fix"` and `"allowOrigin":"*"`.
+5. Open `https://11vhaiejwu.c39.airoapp.ai/api/hello` and verify `"connected":true`.
+6. In the GitHub Pages lesson, click **Reset URL** then **Connect & test**. If direct JSON works but browser fetch fails, inspect the response's CORS header, HTTPS certificate and any GoDaddy proxy redirects.
+
+To check CORS from a terminal:
+
+```bash
+curl -i -H "Origin: https://nodeuse.learnwithchampak.live" \
+  https://11vhaiejwu.c39.airoapp.ai/api/hello
+```
+
+The response must include `Access-Control-Allow-Origin: *`.
+
+Do not put preview sharing tokens in lesson URLs or public repository files.
 
 Developed and maintained by Champak Roy.
 
