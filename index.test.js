@@ -1,4 +1,4 @@
-// Run in backend/: npm test. Uses built-in Node test runner and no dependencies.
+// Run in the nodeuse repository root: npm test. Uses built-in Node test runner and no dependencies.
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
@@ -17,9 +17,11 @@ test("serves Hello World and CORS-enabled JSON", async () => {
     const hello = await fetch(base + "/");
     assert.equal(hello.status, 200);
     assert.match(await hello.text(), /Hello World/);
-    const json = await fetch(base + "/api/hello", { headers: { Origin: "https://programmer-s-picnic.github.io" } });
+    const json = await fetch(base + "/api/hello", { headers: { Origin: "http://nodeuse.learnwithchampak.live" } });
     assert.equal(json.status, 200);
-    assert.equal(json.headers.get("access-control-allow-origin"), "https://programmer-s-picnic.github.io");
+    assert.equal(json.headers.get("access-control-allow-origin"), "http://nodeuse.learnwithchampak.live");
+    const secureCustomOrigin = await fetch(base + "/api/hello", { headers: { Origin: "https://nodeuse.learnwithchampak.live" } });
+    assert.equal(secureCustomOrigin.headers.get("access-control-allow-origin"), "https://nodeuse.learnwithchampak.live");
     assert.equal((await json.json()).connected, true);
     const health = await fetch(base + "/health");
     assert.equal((await health.json()).status, "ok");
