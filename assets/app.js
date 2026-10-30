@@ -215,7 +215,7 @@
         response.textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2);
       } catch (error) {
         const message = error.name === "AbortError" ? "Request timed out." :
-          "Could not read the GoDaddy API. Check the preview URL, GoDaddy preview access, HTTPS, browser CORS policy and server status.";/
+          "Could not read the GoDaddy API. Check the preview URL, GoDaddy preview access, HTTPS, browser CORS policy and server status.";
         show("error", message);
         response.textContent = String(error.message || error);
       } finally { clearTimeout(timeout); submit.disabled = false; }
