@@ -7,9 +7,19 @@ const PORT = Number(process.env.PORT) || 3000;
 // This tutorial exposes ONLY public, read-only GET examples — no cookies, users,
 // or secrets. Wildcard CORS is appropriate here. Do not copy it to an
 // authenticated or personal-data API without a proper access-control design.
-const API_VERSION = "2026-10-30-cors-fix";
+const API_VERSION = "2026-10-30-jsonp-fallback";
 
 function sendJSON(res, status, payload) {
+  // JSONP is enabled only for this public read-only teaching API. It lets the
+  // GitHub Pages lesson work even if a hosting proxy strips CORS headers.
+  // Never expose account data, credentials or private responses through JSONP.
+  const callback = res.jsonpCallback;
+  if (callback) {
+    const safeJSON = JSON.stringify(payload).replace(/</g, "\\u003c")
+      .replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+    res.writeHead(status, { "Content-Type": "application/javascript; charset=utf-8" });
+    return res.end(callback + "(" + safeJSON + ");");
+  }
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
   res.end(JSON.stringify(payload));
 }
@@ -123,6 +133,19 @@ const server = http.createServer((req, res) => {
   let url;
   try { url = new URL(req.url, "http://localhost"); }
   catch { return sendJSON(res, 400, { error: "Invalid URL" }); }
+
+  const callback = url.searchParams.get("callback");
+  if (callback !== null) {
+    // Only predictable single global identifiers, never arbitrary JS text.
+    if (!/^__nodeuse_jsonp_[A-Za-z0-9_]{10,45}$/.test(callback)) {
+      return sendJSON(res, 400, { error: "Invalid JSONP callback." });
+    }
+    // JSONP only for explicitly public API examples (no file or task storage).
+    if (!url.pathname.startsWith("/api/")) {
+      return sendJSON(res, 404, { error: "JSONP is available only for public API routes." });
+    }
+    res.jsonpCallback = callback;
+  }
 
   if (url.pathname === "/") {
     res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
