@@ -5,7 +5,7 @@
  */
 (function () {
   "use strict";
-  const TRUSTED_HOST = "11vhaiejwu.c39.airoapp.ai";
+  const TRUSTED_HOST = "snode.learnwithchampak.live";
   function call(raw, timeoutMs = 9000) {
     const url = new URL(raw);
     if (url.protocol !== "https:" || url.hostname !== TRUSTED_HOST)
