@@ -48,15 +48,15 @@
 </section></div>
 <section id="connection" class="card"><span class="tag">Level 1 — browser to GoDaddy API</span>
 <h2>Connect NodeUse to GoDaddy</h2>
-<p>This public website calls the <strong>published GoDaddy Node.js API</strong> at <code>/api/hello</code>. Private preview addresses cannot reliably accept requests from GitHub Pages. Use <strong>Update Preview → Publish to Live</strong> in GoDaddy to activate your newest backend changes, then test below.</p>
+<p>This public website connects to <strong>https://snode.learnwithchampak.live/</strong>. At Stage 1, the server always returns <code>Hello Champak</code>. Later lessons add dedicated JSON API routes.</p>
 <div class="api-line">
-<div class="form-field"><label for="api-url">Published GoDaddy Node.js API base URL</label><input id="api-url" type="url" placeholder="https://11vhaiejwu.c39.airoapp.ai"></div>
+<div class="form-field"><label for="api-url">Published Node.js server URL</label><input id="api-url" type="url" placeholder="https://snode.learnwithchampak.live"></div>
 <button class="button primary" type="button" id="connect-api">Connect &amp; test</button>
 <button class="button outline" type="button" id="api-reset">Reset URL</button>
 </div>
 <div class="api-status" id="api-status" role="status" aria-live="polite" data-state="idle">Published GoDaddy app URL configured; API connection not yet verified.</div>
 <pre class="terminal" id="api-response">Click Connect &amp; test after deploying the Node.js app.</pre>
-<div class="buttons"><a class="button outline" href="https://11vhaiejwu.c39.airoapp.ai/api/hello" target="_blank" rel="noopener">Open /api/hello directly</a><a class="button outline" href="https://11vhaiejwu.c39.airoapp.ai/health" target="_blank" rel="noopener">Open /health</a></div><div class="notice">If the direct link works but the browser blocks CORS, the public lesson will try a JSONP fallback after the latest backend is deployed. This fallback is for read-only teaching exercises only. If the API remains unreadable, check the proxy headers in <a href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/index.js" target="_blank" rel="noopener">index.js</a>.</div>
+<div class="buttons"><a class="button outline" href="https://snode.learnwithchampak.live/" target="_blank" rel="noopener">Open server directly</a><a class="button outline" href="https://snode.learnwithchampak.live/api/hello" target="_blank" rel="noopener">Open /api/hello (Stage 1)</a></div><div class="notice">If the direct link works but the browser blocks CORS, the public lesson will try a JSONP fallback after the latest backend is deployed. This fallback is for read-only teaching exercises only. If the API remains unreadable, check the proxy headers in <a href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/index.js" target="_blank" rel="noopener">index.js</a>.</div>
 <div class="notice">GitHub Pages runs the frontend; GoDaddy runs Node.js. CORS must allow the <code>nodeuse.learnwithchampak.live</code> origin. <a href="learn/index.html#ch18">Read the CORS lesson</a>.</div>
 </section>
 <section class="card"><h2>Node.js from Hello World to Infinity — 20 lessons</h2>
