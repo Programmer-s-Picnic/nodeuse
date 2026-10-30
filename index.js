@@ -41,7 +41,7 @@ const server = http.createServer((req, res) => {
     });
   }
   if (path === "/health") {
-    return sendJSON(res, 200, { status: "ok", service: "taskmanager-hello-api" });
+    return sendJSON(res, 200, { status: "ok", service: "nodeuse-hello-api" });
   }
   return sendJSON(res, 404, { error: "Not found", path });
 });
