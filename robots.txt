@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://programmer-s-picnic.github.io/nodeuse/sitemap.xml
