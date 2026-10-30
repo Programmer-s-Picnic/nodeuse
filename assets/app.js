@@ -234,18 +234,37 @@
         if (!value || value.connected !== true ||
             typeof value.message !== "string" || !value.message.includes("Hello World"))
           throw new Error("The server returned JSON, but not the NodeUse Hello World API.");
-        show("ok", "Verified published NodeUse API — HTTP " + result.status);
+        show("ok", "Verified NodeUse API via normal CORS fetch — HTTP " + result.status);
         response.textContent = JSON.stringify(value, null, 2);
       } catch (error) {
-        const detail = error.name === "AbortError" ? "Request timed out." :
-          error instanceof TypeError ? "Browser could not fetch the API. Check whether the published URL opens directly, and whether it sends Access-Control-Allow-Origin for this site." :
+        const fetchDetail = error.name === "AbortError" ? "Request timed out." :
           String(error.message || error);
-        show("error", "Public API not verified — " + detail);
+        if ((error instanceof TypeError || error.name === "AbortError") && window.NodeUseJSONP) {
+          show("checking", "Normal fetch failed. Trying public read-only JSONP fallback…");
+          try {
+            const data = await window.NodeUseJSONP.call(base + "/api/hello");
+            if (!data || data.connected !== true || !String(data.message).includes("Hello World"))
+              throw new Error("A script loaded, but it was not the expected NodeUse response.");
+            show("ok", "Connected via JSONP fallback — GoDaddy CORS/proxy still needs attention.");
+            response.textContent = JSON.stringify(data, null, 2) +
+              "\n\nA normal cross-origin fetch was blocked, but this public-only JSONP exercise works." +
+              "\nDo not use JSONP for logged-in users or private data.";
+            return;
+          } catch (fallbackError) {
+            show("error", "Could not reach a readable GoDaddy API. Both fetch and JSONP failed.");
+            response.textContent =
+              "Normal fetch: " + fetchDetail + "\nJSONP fallback: " + fallbackError.message +
+              "\n\nOpen " + base + "/api/diagnostics directly in your browser." +
+              "\nIf you see an old version, Update Preview → Publish to Live." +
+              "\nIf the link fails, use the exact URL from GoDaddy's Published tab.";
+            return;
+          }
+        }
+        show("error", "NodeUse API failed — " + fetchDetail);
         response.textContent =
           "Requested: " + base + "/api/hello\n" +
-          "Direct browser test: " + base + "/api/hello\n" +
-          "If the direct link also fails, update the GoDaddy Preview and Publish to Live.\n" +
-          "If the direct link shows JSON but this page fails, check CORS for " + location.origin + ".";
+          "Open the direct URL. If it returns JSON but the page fails, check GoDaddy proxy headers for " +
+          location.origin + ".";
       } finally {
         clearTimeout(timeout); submit.disabled = false;
       }
