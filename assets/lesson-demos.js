@@ -3,7 +3,7 @@
    "Test on GoDaddy" makes a genuine request to the configured API and reports failure honestly. */
 (() => {
   "use strict";
-  const DEFAULT_API = "https://11vhaiejwu.preview.c39.airoapp.ai";
+  const DEFAULT_API = "https://11vhaiejwu.c39.airoapp.ai";
   const KEY = "pp-nodeuse-api-v1";
   const get = (object, key) => object[key];
   const numeric = (data, key) => {
@@ -76,7 +76,14 @@
   function getApiUrl() {
     try {
       const saved = JSON.parse(localStorage.getItem(KEY) || "null");
-      if (typeof saved === "string" && saved && !saved.includes("11vhaiejwu.c39.airoapp.ai")) return saved;
+      if (typeof saved === "string" && saved.trim()) {
+        const url = new URL(saved);
+        // GoDaddy previews are private and unusable from a public Pages site.
+        if (url.hostname !== "11vhaiejwu.preview.c39.airoapp.ai" &&
+            !url.search && !url.hash && (url.protocol === "https:" ||
+            (url.protocol === "http:" && ["localhost", "127.0.0.1"].includes(url.hostname))))
+          return url.origin;
+      }
     } catch {}
     return DEFAULT_API;
   }
@@ -108,7 +115,7 @@
         if (base.search || base.hash || base.username || base.password)
           throw Error("Use an API base URL without query strings or sharing tokens.");
         remote.disabled = true;
-        show("Connecting to GoDaddy preview…", routes[id]);
+        show("Connecting to the published GoDaddy API…", routes[id]);
         const url = new URL(routes[id], base.origin);
         Object.entries(fields).forEach(([key, value]) => url.searchParams.set(key, value));
         const controller = new AbortController();
@@ -121,7 +128,7 @@
           show("GoDaddy API (HTTP " + response.status + "):", body);
         } finally { clearTimeout(timeout); }
       } catch (error) {
-        show("Could not access the GoDaddy preview API:", error.message + "\nCheck preview access, deployment and CORS. Browser practice above still works offline.");
+        show("Could not access the published GoDaddy API:", error.message + "\nOpen " + DEFAULT_API + "/api/hello directly. If it fails, use GoDaddy Update Preview → Publish to Live. If it works directly, check CORS for this page. Browser practice still works offline.");
       } finally { remote.disabled = false; }
     });
   });
