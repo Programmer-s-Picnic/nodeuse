@@ -6,7 +6,7 @@ const http = require("node:http");
 
 const PORT = Number(process.env.PORT) || 3000;
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ||
-  "https://programmer-s-picnic.github.io,http://localhost:5500,http://127.0.0.1:5500")
+  "http://nodeuse.learnwithchampak.live,https://nodeuse.learnwithchampak.live,https://programmer-s-picnic.github.io,http://localhost:5500,http://127.0.0.1:5500")
   .split(",").map(s => s.trim()).filter(Boolean);
 
 const server = http.createServer((req, res) => {
