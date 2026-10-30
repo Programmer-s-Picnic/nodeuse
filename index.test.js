@@ -52,7 +52,7 @@ test("Hello World, Hello Name, arithmetic, conditions and loops", async (t) => {
     const result = await fetch(root + "/api/hello", { headers: { Origin: origin } });
     assert.equal(result.status, 200);
     assert.equal(result.headers.get("access-control-allow-origin"), "*");
-    assert.equal(result.headers.get("x-nodeuse-api-version"), "2026-10-30-cors-fix");
+    assert.equal(result.headers.get("x-nodeuse-api-version"), "2026-10-30-jsonp-fallback");
     const preflight = await fetch(root + "/api/add?a=1&b=2", {
       method: "OPTIONS", headers: {
         Origin: origin,
@@ -68,7 +68,29 @@ test("Hello World, Hello Name, arithmetic, conditions and loops", async (t) => {
   });
   assert.equal(diagnostics.cors, "public-read-only");
   assert.equal(diagnostics.allowOrigin, "*");
-  assert.equal(diagnostics.apiVersion, "2026-10-30-cors-fix");
+  assert.equal(diagnostics.apiVersion, "2026-10-30-jsonp-fallback");
+
+  const callback = "__nodeuse_jsonp_1234567890abcdef1234567890abcdef";
+  const jsonpResponse = await fetch(root + "/api/hello?callback=" + callback);
+  assert.equal(jsonpResponse.status, 200);
+  assert.match(jsonpResponse.headers.get("content-type"), /^application\/javascript/);
+  assert.equal(jsonpResponse.headers.get("access-control-allow-origin"), "*");
+  const js = await jsonpResponse.text();
+  assert.ok(js.startsWith(callback + "({"));
+  assert.ok(js.endsWith(");"));
+  let captured;
+  const handler = { [callback]: data => { captured = data; } };
+  const vm = require("node:vm");
+  vm.runInNewContext(js, handler, { timeout: 1000 });
+  assert.equal(captured.connected, true);
+  assert.equal(captured.apiVersion, "2026-10-30-jsonp-fallback");
+
+  const addJSONP = await fetch(root + "/api/add?a=12&b=8&callback=" + callback);
+  captured = null;
+  vm.runInNewContext(await addJSONP.text(), handler, { timeout: 1000 });
+  assert.equal(captured.result, 20);
+  assert.equal((await api("/api/hello?callback=alert(1)", 400)).error, "Invalid JSONP callback.");
+  assert.equal((await api("/?callback=" + callback, 404)).error, "JSONP is available only for public API routes.");
 
   for (const path of [
     "/api/hello-name", "/api/hello-name?name=",
