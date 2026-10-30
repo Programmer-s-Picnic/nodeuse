@@ -29,7 +29,7 @@ a,button{overflow-wrap:anywhere}
 <div class="wrap section">
 <section class="card" id="ch0"><div class="course-intro"><div>
 <h2>How to learn</h2><p>Each lesson has a tiny program, explanation, expected output, a practice challenge, a question, and the next lesson. Copy code and experiment with different values.</p>
-<p><strong>Two kinds of practice:</strong> <em>Run in browser</em> calculates locally and works without GoDaddy; <em>Test on GoDaddy</em> makes a real API call. Our published server currently returns Hello Champak; dedicated lesson APIs are introduced later. API connectivity is never simulated.</p>
+<p><strong>Two kinds of practice:</strong> <em>Run in browser</em> calculates locally and works without GoDaddy; <em>Test on GoDaddy</em> makes a real API call. Our published server now reads the <code>?name=</code> parameter and returns plain text; dedicated arithmetic API routes are introduced in later lessons. API connectivity is never simulated.</p>
 </div><div><strong>Progress</strong><p data-progress-count>0 / 20 chapters</p><progress id="course-progress" value="0" max="20"></progress>
 <p class="muted smalltext">Mark lessons complete as you go. Progress is kept in this browser.</p>
 <div class="lesson-note"><strong>Where the code lives</strong><p>One repository: <a href="https://github.com/Programmer-s-Picnic/nodeuse" target="_blank" rel="noopener">Programmer-s-Picnic/nodeuse</a>. GitHub Pages hosts this lesson; GoDaddy executes the Node.js server.</p></div></div></div></section>
@@ -50,13 +50,84 @@ a,button{overflow-wrap:anywhere}
 <section class="card course-chapter" id="ch2" data-chapter="2">
 <span class="tag">Lesson 2 of 20 · Variables and joining text</span>
 <h2 style="margin-top:13px">2. Hello Name</h2>
-<p>Store a name in a variable, then join text using the + operator. Our GoDaddy route accepts ?name= in the URL.</p>
+<p>Store a name in a variable, then join text using the + operator. The GoDaddy server reads <code>?name=</code> from the URL and returns a plain-text greeting.</p>
 <h3>Code — copy, change and run</h3>
 <div class="codebox"><div class="codehead"><strong>JavaScript / Node.js</strong><button type="button" data-copy="code-2">Copy code</button></div><pre id="code-2"><code>const name = &quot;Champak&quot;;
 console.log(&quot;Hello &quot; + name + &quot;!&quot;);</code></pre></div>
 <p class="muted smalltext">For ordinary Node.js snippets, save as <code>lesson2.js</code> and run <code>node lesson2.js</code>. Browser-only snippets are identified by their use of <code>fetch</code>, <code>localStorage</code> or page inputs.</p>
-<h3>Expected output</h3><pre class="terminal">Hello Champak!</pre>
-<div class="exercise"><h3>Try it yourself</h3><p>Run in browser uses local JavaScript. Test on GoDaddy calls our published snode server. At Stage 1, it returns Hello Champak for all paths; dedicated API routes will be implemented later. Run in browser calculates the example now.</p><div data-demo="2"><div class="form-grid"><div class="form-field"><label for="demo-2-name">Your name</label><input id="demo-2-name" type="text" step="1" name="name" value="Champak" required></div></div><div class="buttons"><button class="button primary" type="button" data-demo-local>Run in browser</button><button class="button outline" type="button" data-demo-server>Test on GoDaddy</button></div><pre class="terminal" data-demo-result hidden aria-live="polite"></pre></div><p class="muted smalltext"><strong>Server route:</strong> <code>/api/hello-name?name=Champak</code> · Source: <a href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/index.js" target="_blank" rel="noopener">index.js</a></p></div>
+<h3>Expected output</h3><pre class="terminal">Hello Champak</pre>
+<section class="lesson-note"><h3>Full GoDaddy Node.js server: index.js</h3>
+<p>This is the complete source code of our live Hello Name server, not only a console.log example. It reads a name from the URL and replies in plain text.</p>
+<div class="codebox"><div class="codehead"><strong>Complete index.js</strong><button type="button" data-copy="full-server-2">Copy entire index.js</button></div><pre id="full-server-2"><code>&quot;use strict&quot;;
+
+const http = require(&quot;node:http&quot;);
+
+const PORT = Number(process.env.PORT) || 3000;
+
+const server = http.createServer((req, res) =&gt; {
+
+    // Allow requests from GitHub Pages
+    res.setHeader(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;);
+    res.setHeader(&quot;Access-Control-Allow-Methods&quot;, &quot;GET, OPTIONS&quot;);
+    res.setHeader(&quot;Access-Control-Allow-Headers&quot;, &quot;Content-Type&quot;);
+
+    // Handle CORS preflight requests
+    if (req.method === &quot;OPTIONS&quot;) {
+        res.writeHead(204);
+        res.end();
+        return;
+    }
+
+    // Read name from URL
+    const url = new URL(req.url, &quot;http://localhost&quot;);
+
+    const name = url.searchParams.get(&quot;name&quot;) || &quot;Champak&quot;;
+
+    // Return greeting
+    res.writeHead(200, {
+        &quot;Content-Type&quot;: &quot;text/plain; charset=utf-8&quot;
+    });
+
+    res.end(&quot;Hello &quot; + name);
+
+});
+
+// Start server
+if (require.main === module) {
+    server.listen(PORT, &quot;0.0.0.0&quot;, () =&gt; {
+        console.log(&quot;Server running on port &quot; + PORT);
+    });
+}
+
+module.exports = { server };</code></pre></div>
+<h3>How the request works</h3>
+<p>Open <a href="https://snode.learnwithchampak.live/?name=Sunny" target="_blank" rel="noopener">snode.learnwithchampak.live/?name=Sunny</a>. The browser sends a GET request. The question mark begins the query string, where <code>name</code> is a key and <code>Sunny</code> is its value. Node.js reads it and returns <strong>Hello Sunny</strong>.</p>
+<h3>Line-by-line explanation</h3>
+<ol>
+<li><code>"use strict";</code> enables strict JavaScript rules and prevents some programming mistakes.</li>
+<li><code>require("node:http")</code> loads the built-in Node.js HTTP server module. No additional npm package is needed.</li>
+<li><code>Number(process.env.PORT) || 3000</code> reads the hosting port from GoDaddy. When running locally without a configured port, it uses 3000.</li>
+<li><code>http.createServer((req, res) =&gt; { ... })</code> creates the HTTP server. <code>req</code> describes the incoming request; <code>res</code> is used to send the response.</li>
+<li><code>Access-Control-Allow-Origin: *</code> allows the public teaching website to read this public greeting across domains. Do not use unrestricted CORS for private or authenticated data.</li>
+<li><code>Access-Control-Allow-Methods</code> and <code>Access-Control-Allow-Headers</code> describe permitted cross-origin methods and headers.</li>
+<li><code>if (req.method === "OPTIONS")</code> responds to a browser preflight request with status <code>204</code> and no message body.</li>
+<li><code>new URL(req.url, "http://localhost")</code> parses the incoming URL. The localhost value is only a parsing base, not the address visitors use.</li>
+<li><code>url.searchParams.get("name")</code> retrieves the name from <code>?name=Sunny</code>. When the name is missing or empty, <code>|| "Champak"</code> supplies the default.</li>
+<li><code>res.writeHead(200, {"Content-Type": "text/plain; charset=utf-8"})</code> reports success and instructs the browser to treat the response as text.</li>
+<li><code>res.end("Hello " + name)</code> joins Hello, a space and the name, sends the greeting and finishes the response.</li>
+<li><code>require.main === module</code> starts the server only when the file is executed directly. <code>server.listen(PORT, "0.0.0.0")</code> listens on the configured port.</li>
+<li><code>module.exports = { server }</code> makes the server available to other JavaScript files, particularly automated tests.</li>
+</ol>
+<h3>Test on the actual GoDaddy server</h3>
+<ul><li><a href="https://snode.learnwithchampak.live/" target="_blank" rel="noopener">No name → Hello Champak</a></li>
+<li><a href="https://snode.learnwithchampak.live/?name=Sunny" target="_blank" rel="noopener">Sunny → Hello Sunny</a></li>
+<li><a href="https://snode.learnwithchampak.live/?name=Priya" target="_blank" rel="noopener">Priya → Hello Priya</a></li>
+<li><a href="https://snode.learnwithchampak.live/?name=Riya%20Sharma" target="_blank" rel="noopener">Riya Sharma → Hello Riya Sharma</a></li></ul>
+<h3>Run it locally and deploy</h3>
+<p>Save as <code>index.js</code>, run <code>node index.js</code>, and visit <code>http://localhost:3000/?name=Sunny</code>. To update the GoDaddy Airo deployment, commit the changed file to <a href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/index.js">GitHub</a>, then choose <strong>Update Preview</strong> and <strong>Publish to Live</strong>.</p>
+<p><strong>Important:</strong> Spaces in a URL are encoded as <code>%20</code>. This beginner server sends plain text and uses the same greeting handler for every path; an addition API has not yet been implemented. For real applications, validate user input and securely encode it whenever rendering HTML.</p>
+</section>
+<div class="exercise"><h3>Try it yourself</h3><p>Run in browser uses local JavaScript. Test on GoDaddy calls our published snode server. This is a real server exercise: enter a name and click Test on GoDaddy to request <code>/?name=yourName</code>. Run in browser performs the example locally.</p><div data-demo="2"><div class="form-grid"><div class="form-field"><label for="demo-2-name">Your name</label><input id="demo-2-name" type="text" step="1" name="name" value="Champak" required></div></div><div class="buttons"><button class="button primary" type="button" data-demo-local>Run in browser</button><button class="button outline" type="button" data-demo-server>Test on GoDaddy</button></div><pre class="terminal" data-demo-result hidden aria-live="polite"></pre></div><p class="muted smalltext"><strong>Server route:</strong> <code>/?name=Champak</code> · Source: <a href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/index.js" target="_blank" rel="noopener">index.js</a></p></div>
 <p><strong>Your challenge:</strong> Change the name to a friend&#39;s name. What changes in the output?</p>
 <details id="quiz2"><summary>Knowledge check: What is the purpose of const name?</summary><p>It creates a variable named name whose value is not reassigned.</p><button class="button small" type="button" data-share="#quiz2">Share this question</button></details>
 <div class="course-footer"><div class="buttons" style="margin-top:0"><a class="button" href="#ch1">← Previous</a><a class="button primary" href="#ch3">Next lesson →</a></div><div class="buttons" style="margin-top:0"><a href="https://editor.learnwithchampak.live/" target="_blank" rel="noopener" class="button small">Our code editor</a><button type="button" class="button small" data-share="#ch2">Share chapter</button><a class="button small" target="_blank" rel="noopener" href="https://wa.me/?text=Hello%20Name%20%E2%80%94%20http%3A%2F%2Fnodeuse.learnwithchampak.live%2Flearn%2F%23ch2">WhatsApp</a><button type="button" class="button small" data-mark-complete>Mark chapter complete</button></div></div>
