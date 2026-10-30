@@ -40,6 +40,9 @@
       };
       window[callback] = data => settle(null, data);
       script.onerror = () => settle(new Error("The public GoDaddy server did not load the JSONP script. Confirm its exact Published URL and latest deployed version."));
+      script.onload = () => {
+        if (!settled) settle(new Error("GoDaddy returned a script but did not call our callback. Update Preview and Publish to Live; the published version may be old."));
+      };
       timer = setTimeout(() => settle(new Error("The JSONP fallback timed out. The published server may not have the updated API.")), timeoutMs);
       script.async = true;
       script.referrerPolicy = "no-referrer";
