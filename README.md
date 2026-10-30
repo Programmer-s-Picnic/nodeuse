@@ -1,4 +1,4 @@
-# NodeUse — Node.js on GoDaddy, from 0 to Infinity
+**Current stage:** The live server at https://snode.learnwithchampak.live/ accepts `?name=Sunny` and returns `Hello Sunny`; without a name it returns `Hello Champak`. Lesson 2 embeds the full `index.js` and detailed explanations. The backend still does not have arithmetic or JSON API routes.\n\n# NodeUse — Node.js on GoDaddy, from 0 to Infinity
 
 **One repository for the whole project.**
 
