@@ -42,15 +42,33 @@ test("Hello World, Hello Name, arithmetic, conditions and loops", async (t) => {
   assert.equal((await api("/api/grade?marks=80")).grade, "B");
   assert.equal((await api("/health")).status, "ok");
 
-  const customOrigin = "http://nodeuse.learnwithchampak.live";
-  const valid = await fetch(root + "/api/add?a=1&b=2", { headers: { Origin: customOrigin } });
-  assert.equal(valid.headers.get("access-control-allow-origin"), customOrigin);
-  const secure = await fetch(root + "/api/hello-name?name=A", { headers: { Origin: "https://nodeuse.learnwithchampak.live" } });
-  assert.equal(secure.headers.get("access-control-allow-origin"), "https://nodeuse.learnwithchampak.live");
-  const denied = await fetch(root + "/api/add?a=1&b=2", { headers: { Origin: "https://untrusted.invalid" } });
-  assert.equal(denied.headers.get("access-control-allow-origin"), null);
-  assert.equal((await fetch(root + "/api/add?a=1&b=2", { method: "OPTIONS", headers: { Origin: customOrigin } })).status, 204);
-  assert.equal((await fetch(root + "/api/add?a=1&b=2", { method: "OPTIONS", headers: { Origin: "https://untrusted.invalid" } })).status, 403);
+  // Every endpoint in this demo is public and read-only. Browsers from any
+  // origin may read it without credentials; production user data is different.
+  for (const origin of [
+    "https://nodeuse.learnwithchampak.live",
+    "http://nodeuse.learnwithchampak.live",
+    "https://example.org"
+  ]) {
+    const result = await fetch(root + "/api/hello", { headers: { Origin: origin } });
+    assert.equal(result.status, 200);
+    assert.equal(result.headers.get("access-control-allow-origin"), "*");
+    assert.equal(result.headers.get("x-nodeuse-api-version"), "2026-10-30-cors-fix");
+    const preflight = await fetch(root + "/api/add?a=1&b=2", {
+      method: "OPTIONS", headers: {
+        Origin: origin,
+        "Access-Control-Request-Method": "GET"
+      }
+    });
+    assert.equal(preflight.status, 204);
+    assert.equal(preflight.headers.get("access-control-allow-origin"), "*");
+    assert.match(preflight.headers.get("access-control-allow-methods"), /GET/);
+  }
+  const diagnostics = await api("/api/diagnostics", 200, {
+    Origin: "https://nodeuse.learnwithchampak.live"
+  });
+  assert.equal(diagnostics.cors, "public-read-only");
+  assert.equal(diagnostics.allowOrigin, "*");
+  assert.equal(diagnostics.apiVersion, "2026-10-30-cors-fix");
 
   for (const path of [
     "/api/hello-name", "/api/hello-name?name=",
