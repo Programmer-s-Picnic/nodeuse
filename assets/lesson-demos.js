@@ -121,14 +121,26 @@
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 9000);
         try {
-          const response = await fetch(url.href, { signal: controller.signal, cache: "no-store" });
-          const type = response.headers.get("content-type") || "";
-          if (!type.includes("application/json")) throw Error("The server returned a non-JSON page, possibly a GoDaddy preview sign-in.");
-          const body = await response.json();
-          show("GoDaddy API (HTTP " + response.status + "):", body);
+          try {
+            const response = await fetch(url.href, { signal: controller.signal, cache: "no-store", credentials: "omit" });
+            const type = response.headers.get("content-type") || "";
+            if (!type.includes("application/json")) throw Error("The server returned a non-JSON page.");
+            const body = await response.json();
+            if (!response.ok) throw Error(body.error || "HTTP " + response.status);
+            show("GoDaddy API using normal fetch (HTTP " + response.status + "):", body);
+          } catch (fetchError) {
+            if ((fetchError instanceof TypeError || fetchError.name === "AbortError") &&
+                window.NodeUseJSONP) {
+              show("Trying public-only JSONP fallback…", routes[id]);
+              const data = await window.NodeUseJSONP.call(url.href);
+              show("GoDaddy API via JSONP (browser CORS blocked; public examples only):", data);
+            } else {
+              throw fetchError;
+            }
+          }
         } finally { clearTimeout(timeout); }
       } catch (error) {
-        show("Could not access the published GoDaddy API:", error.message + "\nOpen " + DEFAULT_API + "/api/hello directly. If it fails, use GoDaddy Update Preview → Publish to Live. If it works directly, check CORS for this page. Browser practice still works offline.");
+        show("Could not access the published GoDaddy API:", error.message + "\nOpen " + DEFAULT_API + "/api/diagnostics directly. If it fails, use the URL in the GoDaddy Published tab. If the version is old, Update Preview → Publish to Live. Browser practice still works offline.");
       } finally { remote.disabled = false; }
     });
   });
