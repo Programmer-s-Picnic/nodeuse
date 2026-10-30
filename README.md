@@ -2,8 +2,8 @@
 
 **One repository for the whole project.**
 
-- **GitHub Pages frontend (after enabling Pages):** https://programmer-s-picnic.github.io/nodeuse/
-- **Complete 13-chapter 0 → ∞ course:** https://programmer-s-picnic.github.io/nodeuse/learn/
+- **GitHub Pages frontend (custom domain):** http://nodeuse.learnwithchampak.live/
+- **Complete 13-chapter 0 → ∞ course:** http://nodeuse.learnwithchampak.live/learn/
 - **GitHub source (frontend + backend):** https://github.com/Programmer-s-Picnic/nodeuse
 - **Intended GoDaddy backend host:** https://cserver.learnwithchampak.live (verify actual app mapping after publishing)
 
@@ -27,7 +27,7 @@ nodeuse/
 
 In this **nodeuse** repository open **Settings → Pages**. Under **Build and deployment → Source**, select **GitHub Actions**. The included `.github/workflows/publish-pages.yml` publishes the static site on pushes to `main`; you can also use **Actions → Publish NodeUse learning site → Run workflow**. If you prefer branch publishing, select **Deploy from a branch → main → /(root)** instead. Use one publishing method consistently.
 
-The intended public address is https://programmer-s-picnic.github.io/nodeuse/ after a successful GitHub Pages deployment. Check the deployment job's actual Pages URL and status before sharing it as live.
+The intended public address is http://nodeuse.learnwithchampak.live/ after the DNS mapping and GitHub Pages deployment succeed. The repository's `CNAME` file specifies `nodeuse.learnwithchampak.live`. Verify the site and consider enabling **Enforce HTTPS** in Pages settings once the certificate is ready; until verified, links use the supplied HTTP address.
 
 GitHub Pages serves static HTML/CSS/JavaScript from the repository; it does **not** execute `index.js`.
 
@@ -56,6 +56,6 @@ The home, Task Entry and All Tasks pages provide local task management. **Tasks 
 
 ## CORS and security
 
-The backend permits the GitHub Pages **origin** `https://programmer-s-picnic.github.io` (without `/nodeuse/`), plus local development origins. An `ALLOWED_ORIGINS` environment variable can override this list. CORS is not authentication. Do not place private keys, SQL connection strings or secrets in GitHub Pages or public code.
+The backend permits the custom GitHub Pages **origins** `http://nodeuse.learnwithchampak.live` and `https://nodeuse.learnwithchampak.live`, the default `https://programmer-s-picnic.github.io` origin, and local development origins. An `ALLOWED_ORIGINS` environment variable can override this list. CORS is not authentication. Do not place private keys, SQL connection strings or secrets in GitHub Pages or public code.
 
 Developed and maintained by Champak Roy.
