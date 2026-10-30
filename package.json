@@ -1,8 +1,8 @@
 {
-  "name": "taskmanager-hello-api",
+  "name": "nodeuse-hello-api",
   "version": "1.0.0",
   "private": true,
-  "description": "GoDaddy Node.js Hello World backend for the Programmer's Picnic Task Manager tutorial",
+  "description": "GoDaddy Node.js Hello World backend for Programmer's Picnic NodeUse lesson",
   "main": "index.js",
   "engines": {
     "node": "22.x"
