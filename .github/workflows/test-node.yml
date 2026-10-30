@@ -1,0 +1,31 @@
+name: Test NodeUse examples
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.js'
+      - 'index.test.js'
+      - 'package.json'
+      - '.github/workflows/test-node.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  node-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check syntax
+        run: |
+          node --check index.js
+          node --check index.test.js
+          node --check assets/app.js
+          node --check assets/lesson-demos.js
+      - name: Test all beginner API examples
+        run: npm test
