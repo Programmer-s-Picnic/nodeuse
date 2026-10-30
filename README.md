@@ -5,8 +5,8 @@
 - **GitHub Pages frontend (custom domain):** http://nodeuse.learnwithchampak.live/
 - **Complete 20-lesson 0 → ∞ course:** http://nodeuse.learnwithchampak.live/learn/
 - **GitHub source (frontend + backend):** https://github.com/Programmer-s-Picnic/nodeuse
-- **GoDaddy preview API URL for this lesson:** https://11vhaiejwu.preview.c39.airoapp.ai (response not independently verified)
-- **GoDaddy published-app hostname:** https://11vhaiejwu.c39.airoapp.ai (use for public production integrations after validation)
+- **GoDaddy preview URL (private; not for website fetch):** https://11vhaiejwu.preview.c39.airoapp.ai
+- **GoDaddy published API default for this lesson:** https://11vhaiejwu.c39.airoapp.ai (live response still needs verification)
 - **Private preview:** preview environment, accessed from GoDaddy dashboard. Do not commit or publish preview share tokens.
 
 ## Project structure
@@ -41,7 +41,7 @@ GitHub Pages serves static HTML/CSS/JavaScript from the repository; it does **no
 3. Build command: `npm run build`; start command: `npm start`. The server listens on `process.env.PORT`.
 4. Preview, then publish. Use the **public HTTPS hostname** shown in the dashboard, not the private preview URL or its share token. The known published hostname is `https://11vhaiejwu.c39.airoapp.ai`.
 5. Check endpoints: `/` (Hello World), `/api/hello` (JSON), `/health` (JSON health), `/api/hello-name?name=Champak` and `/api/add?a=2&b=3`.
-6. Go to the GitHub Pages frontend. The connection tester is prefilled with the preview API URL `https://11vhaiejwu.preview.c39.airoapp.ai`. Click **Connect & test** to validate. GoDaddy may require a preview session, and the public lesson cannot safely embed a preview sharing token. For production use the published hostname after verification.
+6. Go to the GitHub Pages frontend. The connection tester uses the **published** API at `https://11vhaiejwu.c39.airoapp.ai`, not the private preview. Click **Connect & test**. If the direct `/api/hello` URL works but fetch fails, inspect CORS headers on the published deployment.
 
 ## Run and test locally (Node.js 22)
 
@@ -67,4 +67,4 @@ Developed and maintained by Champak Roy.
 
 The course now starts with **1. Hello World → 2. Hello Name → 3. Add 2 Numbers**, followed by subtraction, multiplication, division, even/odd, largest of three, multiplication table, factorial, Fibonacci, arrays, palindromes, grades, JSON, fetch, HTML forms, GoDaddy/CORS, browser tasks, and REST/database design.
 
-Lessons 1–14 have a local JavaScript practice runner and a separate GoDaddy API runner. The latter requires deployment of the latest backend and may fail when GoDaddy preview access needs sign-in. The preview share token is never stored in source control. The Task Manager remains browser-local (not database-backed).
+Lessons 1–14 have a local JavaScript practice runner and a separate GoDaddy **published API** runner. To update the API, use **Update Preview → Publish to Live** in GoDaddy. The published backend must allow this website’s origin in its CORS headers. The preview share token is never stored in source control. The Task Manager remains browser-local (not database-backed).
