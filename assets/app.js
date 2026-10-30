@@ -163,22 +163,39 @@
     $("#task-name", form).focus();
   }
 
+  // The public GoDaddy endpoint is designed for website-to-API requests.
+  // Preview endpoints are private and cannot reliably be fetched by GitHub Pages.
+  const LIVE_API = "https://11vhaiejwu.c39.airoapp.ai";
+  const PREVIEW_HOST = "11vhaiejwu.preview.c39.airoapp.ai";
   function baseUrl(raw) {
     const parsed = new URL(raw);
     if (parsed.protocol !== "https:" &&
       !(parsed.protocol === "http:" && ["localhost", "127.0.0.1"].includes(parsed.hostname))) {
-      throw new Error("Use an HTTPS URL (or HTTP localhost for local testing).");
+      throw new Error("Use an HTTPS API address, or HTTP localhost for development.");
     }
     if (parsed.username || parsed.password || parsed.search || parsed.hash)
-      throw new Error("Enter a base URL only, with no password, query or fragment.");
-    return parsed.href.replace(/\/+$/, "");
+      throw new Error("Enter the server base URL without a query string, token or fragment.");
+    if (parsed.hostname === PREVIEW_HOST)
+      throw new Error("GoDaddy preview URLs are private. Use the published URL: " + LIVE_API);
+    const path = parsed.pathname.replace(/\/+$/, "");
+    if (path === "/api/hello" || path === "/health") parsed.pathname = "/";
+    else if (path !== "") throw new Error("Enter only the server base URL (no /api/... path).");
+    return parsed.origin;
   }
   function initConnection() {
     const input = $("#api-url");
     const submit = $("#connect-api");
     if (!input || !submit) return;
     const saved = read(API_KEY, "");
-    if (typeof saved === "string") input.value = (!saved || saved === "https://11vhaiejwu.c39.airoapp.ai") ? "https://11vhaiejwu.preview.c39.airoapp.ai" : saved;
+    // Migrate preview selections from the old course; protect any unrelated custom server.
+    let defaultValue = LIVE_API;
+    if (typeof saved === "string" && saved.trim()) {
+      try {
+        const parsed = new URL(saved);
+        if (parsed.hostname !== PREVIEW_HOST) defaultValue = baseUrl(saved);
+      } catch { defaultValue = LIVE_API; }
+    }
+    input.value = defaultValue;
     const status = $("#api-status");
     const response = $("#api-response");
     function show(state, line) {
@@ -187,44 +204,57 @@
     }
     submit.addEventListener("click", async () => {
       let base;
-      try { base = baseUrl(input.value.trim()); }
-      catch (error) { show("error", error.message || "Invalid API URL."); return; }
+      try { base = baseUrl(input.value.trim()); input.value = base; }
+      catch (error) {
+        show("error", error.message || "Invalid API URL.");
+        response.textContent = "Use the public GoDaddy app address: " + LIVE_API;
+        return;
+      }
       if (!save(API_KEY, base)) return;
       submit.disabled = true;
-      show("checking", "Connecting to GoDaddy Node.js…");
-      response.textContent = "Waiting for a server response…";
+      show("checking", "Contacting the public GoDaddy API…");
+      response.textContent = "GET " + base + "/api/hello";
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
       try {
-        let result = await fetch(base + "/api/hello", { signal: controller.signal, cache: "no-store" });
-        if (result.status === 404) {
-          result = await fetch(base + "/", { signal: controller.signal, cache: "no-store" });
+        const result = await fetch(base + "/api/hello", {
+          signal: controller.signal, cache: "no-store", credentials: "omit", redirect: "follow"
+        });
+        if (!result.ok) {
+          if (result.status === 401 || result.status === 403)
+            throw new Error("HTTP " + result.status + ": access denied. Check GoDaddy's Published app, not Preview.");
+          if (result.status === 404)
+            throw new Error("HTTP 404: /api/hello not found. Update Preview, then Publish to Live in GoDaddy.");
+          throw new Error("Server returned HTTP " + result.status + ".");
         }
-        if (!result.ok) throw Error("Server returned HTTP " + result.status + ".");
         const type = result.headers.get("content-type") || "";
-        const value = type.includes("application/json") ? await result.json() : await result.text();
-        if (typeof value === "string") {
-          if (!/^Hello World\b/.test(value.trim())) {
-            throw Error("The host responded, but not with the expected Hello World Node.js greeting.");
-          }
-        } else if (!value || value.connected !== true || typeof value.message !== "string" ||
-                   !value.message.includes("Hello World")) {
-          throw Error("A server responded, but this is not our expected Hello World API.");
-        }
-        show("ok", "Verified Hello World API — HTTP " + result.status);
-        response.textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+        if (!type.includes("application/json"))
+          throw new Error("The server returned a webpage instead of JSON. Confirm the published app serves index.js.");
+        const value = await result.json();
+        if (!value || value.connected !== true ||
+            typeof value.message !== "string" || !value.message.includes("Hello World"))
+          throw new Error("The server returned JSON, but not the NodeUse Hello World API.");
+        show("ok", "Verified published NodeUse API — HTTP " + result.status);
+        response.textContent = JSON.stringify(value, null, 2);
       } catch (error) {
-        const message = error.name === "AbortError" ? "Request timed out." :
-          "Could not read the GoDaddy API. Check the preview URL, GoDaddy preview access, HTTPS, browser CORS policy and server status.";
-        show("error", message);
-        response.textContent = String(error.message || error);
-      } finally { clearTimeout(timeout); submit.disabled = false; }
+        const detail = error.name === "AbortError" ? "Request timed out." :
+          error instanceof TypeError ? "Browser could not fetch the API. Check whether the published URL opens directly, and whether it sends Access-Control-Allow-Origin for this site." :
+          String(error.message || error);
+        show("error", "Public API not verified — " + detail);
+        response.textContent =
+          "Requested: " + base + "/api/hello\n" +
+          "Direct browser test: " + base + "/api/hello\n" +
+          "If the direct link also fails, update the GoDaddy Preview and Publish to Live.\n" +
+          "If the direct link shows JSON but this page fails, check CORS for " + location.origin + ".";
+      } finally {
+        clearTimeout(timeout); submit.disabled = false;
+      }
     });
     $("#api-reset")?.addEventListener("click", () => {
-      input.value = "https://11vhaiejwu.preview.c39.airoapp.ai";
+      input.value = LIVE_API;
       try { localStorage.removeItem(API_KEY); } catch {}
-      show("idle", "GoDaddy preview API configured; connection not verified. Preview access may require a GoDaddy session.");
-      response.textContent = "Click Connect & test after publishing NodeUse on the selected GoDaddy URL.";
+      show("idle", "Public GoDaddy app URL selected; click Connect & test.");
+      response.textContent = "GET " + LIVE_API + "/api/hello";
     });
   }
   function initLessons() {
