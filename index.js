@@ -4,9 +4,10 @@
 // Built-in Node.js modules only. GET demos; tasks remain local to the browser.
 const http = require("node:http");
 const PORT = Number(process.env.PORT) || 3000;
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ||
-  "http://nodeuse.learnwithchampak.live,https://nodeuse.learnwithchampak.live,https://programmer-s-picnic.github.io,http://localhost:5500,http://127.0.0.1:5500")
-  .split(",").map(value => value.trim()).filter(Boolean);
+// This tutorial exposes ONLY public, read-only GET examples — no cookies, users,
+// or secrets. Wildcard CORS is appropriate here. Do not copy it to an
+// authenticated or personal-data API without a proper access-control design.
+const API_VERSION = "2026-10-30-cors-fix";
 
 function sendJSON(res, status, payload) {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
@@ -103,18 +104,18 @@ function exercise(path, query) {
 }
 
 const server = http.createServer((req, res) => {
-  const origin = req.headers.origin;
-  if (origin && ALLOWED_ORIGINS.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    res.setHeader("Vary", "Origin");
-  }
+  // Allow requests from the NodeUse GitHub Pages custom domain and any other
+  // frontend for these harmless public demonstrations. No credentials allowed.
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Max-Age", "600");
+  res.setHeader("X-NodeUse-API-Version", API_VERSION);
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Cache-Control", "no-store");
 
   if (req.method === "OPTIONS") {
-    res.writeHead(origin && ALLOWED_ORIGINS.includes(origin) ? 204 : 403);
+    res.writeHead(204);
     return res.end();
   }
   if (req.method !== "GET") return sendJSON(res, 405, { error: "Method not allowed" });
@@ -127,8 +128,19 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
     return res.end("Hello World! Welcome to Programmer's Picnic.");
   }
+  if (url.pathname === "/api/diagnostics") {
+    return sendJSON(res, 200, {
+      service: "nodeuse-hello-api",
+      status: "ok",
+      apiVersion: API_VERSION,
+      cors: "public-read-only",
+      allowOrigin: "*",
+      receivedOrigin: req.headers.origin || null,
+      note: "No credentials or private data in this teaching API"
+    });
+  }
   if (url.pathname === "/health") {
-    return sendJSON(res, 200, { status: "ok", service: "nodeuse-hello-api" });
+    return sendJSON(res, 200, { status: "ok", service: "nodeuse-hello-api", apiVersion: API_VERSION });
   }
   if (url.pathname === "/api/hello") {
     return sendJSON(res, 200, {
