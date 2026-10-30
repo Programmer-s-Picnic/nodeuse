@@ -165,7 +165,7 @@
 
   // The public GoDaddy endpoint is designed for website-to-API requests.
   // Preview endpoints are private and cannot reliably be fetched by GitHub Pages.
-  const LIVE_API = "https://11vhaiejwu.c39.airoapp.ai";
+  const LIVE_API = "https://snode.learnwithchampak.live";
   const PREVIEW_HOST = "11vhaiejwu.preview.c39.airoapp.ai";
   function baseUrl(raw) {
     const parsed = new URL(raw);
@@ -192,7 +192,7 @@
     if (typeof saved === "string" && saved.trim()) {
       try {
         const parsed = new URL(saved);
-        if (parsed.hostname !== PREVIEW_HOST) defaultValue = baseUrl(saved);
+        if (parsed.hostname !== PREVIEW_HOST && parsed.hostname !== "11vhaiejwu.c39.airoapp.ai") defaultValue = baseUrl(saved);
       } catch { defaultValue = LIVE_API; }
     }
     input.value = defaultValue;
@@ -213,11 +213,11 @@
       if (!save(API_KEY, base)) return;
       submit.disabled = true;
       show("checking", "Contacting the public GoDaddy API…");
-      response.textContent = "GET " + base + "/api/hello";
+      response.textContent = "GET " + base + "/";
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
       try {
-        const result = await fetch(base + "/api/hello", {
+        const result = await fetch(base + "/", {
           signal: controller.signal, cache: "no-store", credentials: "omit", redirect: "follow"
         });
         if (!result.ok) {
@@ -228,14 +228,18 @@
           throw new Error("Server returned HTTP " + result.status + ".");
         }
         const type = result.headers.get("content-type") || "";
-        if (!type.includes("application/json"))
-          throw new Error("The server returned a webpage instead of JSON. Confirm the published app serves index.js.");
-        const value = await result.json();
-        if (!value || value.connected !== true ||
-            typeof value.message !== "string" || !value.message.includes("Hello World"))
-          throw new Error("The server returned JSON, but not the NodeUse Hello World API.");
-        show("ok", "Verified NodeUse API via normal CORS fetch — HTTP " + result.status);
-        response.textContent = JSON.stringify(value, null, 2);
+        const body = await result.text();
+        if (body.trim() === "Hello Champak") {
+          show("ok", "Connected: GoDaddy Node.js server responded Hello Champak.");
+          response.textContent = "Hello Champak\n\nStage 1 server is working. Dedicated JSON routes for Hello Name and Add Two Numbers will be added in later lessons.";
+        } else if (type.includes("application/json")) {
+          const data = JSON.parse(body);
+          if (!data || data.connected !== true) throw Error("Unexpected JSON API response.");
+          show("ok", "Connected: NodeUse JSON API is responding.");
+          response.textContent = JSON.stringify(data, null, 2);
+        } else {
+          throw Error("Unexpected server response: " + body.slice(0, 120));
+        }
       } catch (error) {
         const fetchDetail = error.name === "AbortError" ? "Request timed out." :
           String(error.message || error);
@@ -273,7 +277,7 @@
       input.value = LIVE_API;
       try { localStorage.removeItem(API_KEY); } catch {}
       show("idle", "Public GoDaddy app URL selected; click Connect & test.");
-      response.textContent = "GET " + LIVE_API + "/api/hello";
+      response.textContent = "GET " + LIVE_API + "/";
     });
   }
   function initLessons() {
