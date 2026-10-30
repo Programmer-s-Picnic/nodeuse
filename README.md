@@ -5,7 +5,8 @@
 - **GitHub Pages frontend (custom domain):** http://nodeuse.learnwithchampak.live/
 - **Complete 13-chapter 0 → ∞ course:** http://nodeuse.learnwithchampak.live/learn/
 - **GitHub source (frontend + backend):** https://github.com/Programmer-s-Picnic/nodeuse
-- **Intended GoDaddy backend host:** https://cserver.learnwithchampak.live (verify actual app mapping after publishing)
+- **GoDaddy app public hostname shown in dashboard:** https://11vhaiejwu.c39.airoapp.ai (HTTP/API response not independently verified)
+- **Private preview:** preview environment, accessed from GoDaddy dashboard. Do not commit or publish preview share tokens.
 
 ## Project structure
 
@@ -36,9 +37,9 @@ GitHub Pages serves static HTML/CSS/JavaScript from the repository; it does **no
 1. In the GoDaddy hosting dashboard for `cserver.learnwithchampak.live`, find **Node.js Apps → Add App**.
 2. Connect the **nodeuse** GitHub repository or upload a ZIP containing `index.js` and `package.json` at the ZIP root.
 3. Build command: `npm run build`; start command: `npm start`. The server listens on `process.env.PORT`.
-4. Preview, then publish. Use the **actual public HTTPS address** assigned/mapped by GoDaddy.
+4. Preview, then publish. Use the **public HTTPS hostname** shown in the dashboard, not the private preview URL or its share token. The known published hostname is `https://11vhaiejwu.c39.airoapp.ai`.
 5. Check endpoints: `/` (Hello World), `/api/hello` (JSON), `/health` (JSON health).
-6. Go to the GitHub Pages frontend, enter the published GoDaddy base URL in the connection tester, and click **Connect & test**. The suggested hostname is not proof the backend is live.
+6. Go to the GitHub Pages frontend, enter the published GoDaddy base URL in the connection tester, and click **Connect & test**. The prefilled published hostname is not proof that the newest API release is live; click **Connect & test** to verify.
 
 ## Run and test locally (Node.js 22)
 
