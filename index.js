@@ -1,3 +1,4 @@
+
 "use strict";
 
 const http = require("node:http");
@@ -18,16 +19,21 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // Always return Hello Champak
+    // Read name from URL
+    const url = new URL(req.url, "http://localhost");
+
+    const name = url.searchParams.get("name") || "Champak";
+
+    // Return greeting
     res.writeHead(200, {
         "Content-Type": "text/plain; charset=utf-8"
     });
 
-    res.end("Hello Champak");
+    res.end("Hello " + name);
 
 });
 
-// Start the Node.js server
+// Start server
 if (require.main === module) {
     server.listen(PORT, "0.0.0.0", () => {
         console.log("Server running on port " + PORT);
