@@ -329,20 +329,19 @@ fetch(api + &quot;/api/add?&quot; + values)
 <section class="card course-chapter" id="ch18" data-chapter="18">
 <span class="tag">Lesson 18 of 20 · Preview, publish, and access rules</span>
 <h2 style="margin-top:13px">18. Deploy on GoDaddy + CORS</h2>
-<p>The backend runs on GoDaddy; this course&#39;s HTML is hosted on GitHub Pages. The API must allow the Pages origin to read responses. A GoDaddy preview may still require authentication.</p>
+<p>The backend runs on GoDaddy; this course&#39;s HTML is hosted on GitHub Pages. Our <strong>public, read-only demonstration API</strong> now uses <code>Access-Control-Allow-Origin: *</code>, so students can call it from any website without credentials. This is <strong>not</strong> a suitable default for private user data or authenticated endpoints. A <code>Failed to fetch</code> message can also mean that GoDaddy&#39;s published app is offline or has not received the latest deployment.</p>
 <h3>Code — copy, change and run</h3>
-<div class="codebox"><div class="codehead"><strong>JavaScript / Node.js</strong><button type="button" data-copy="code-18">Copy code</button></div><pre id="code-18"><code>// Node.js allows our GitHub Pages origin:
-const origin = req.headers.origin;
-if ([&quot;http://nodeuse.learnwithchampak.live&quot;,
-     &quot;https://nodeuse.learnwithchampak.live&quot;].includes(origin)) {
-  res.setHeader(&quot;Access-Control-Allow-Origin&quot;, origin);
-}
-// See index.js for the complete HTTP server.</code></pre></div>
+<div class="codebox"><div class="codehead"><strong>JavaScript / Node.js</strong><button type="button" data-copy="code-18">Copy code</button></div><pre id="code-18"><code>// Public read-only examples — no accounts or cookies:
+res.setHeader(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;);
+res.setHeader(&quot;Access-Control-Allow-Methods&quot;, &quot;GET, OPTIONS&quot;);
+res.setHeader(&quot;Access-Control-Allow-Headers&quot;, &quot;Content-Type&quot;);
+// Handle OPTIONS preflight with HTTP 204.
+// Never use public wildcard access for sensitive account data.</code></pre></div>
 <p class="muted smalltext">For ordinary Node.js snippets, save as <code>lesson18.js</code> and run <code>node lesson18.js</code>. Browser-only snippets are identified by their use of <code>fetch</code>, <code>localStorage</code> or page inputs.</p>
-<h3>Expected output</h3><pre class="terminal">GET /health → {&quot;status&quot;:&quot;ok&quot;,&quot;service&quot;:&quot;nodeuse-hello-api&quot;}</pre>
-<div class="exercise"><strong>Practical activity:</strong> Deploy the latest main branch with Update Preview, test /health, then Publish to Live. Never commit preview share tokens.<p class="muted smalltext"><strong>Server route:</strong> <code>/health</code> · Source: <a href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/index.js" target="_blank" rel="noopener">index.js</a></p><p><a href="https://editor.learnwithchampak.live/" target="_blank" rel="noopener">Open our code editor</a></p></div>
+<h3>Expected output</h3><pre class="terminal">GET /health → {&quot;status&quot;:&quot;ok&quot;,&quot;service&quot;:&quot;nodeuse-hello-api&quot;,&quot;apiVersion&quot;:&quot;2026-10-30-cors-fix&quot;}</pre>
+<div class="exercise"><strong>Practical activity:</strong> Click Update Preview, verify /api/diagnostics in the GoDaddy Preview, then Publish to Live. Open the Published URL to verify version 2026-10-30-cors-fix. Never commit preview share tokens.<p class="muted smalltext"><strong>Server route:</strong> <code>/health</code> · Source: <a href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/index.js" target="_blank" rel="noopener">index.js</a></p><p><a href="https://editor.learnwithchampak.live/" target="_blank" rel="noopener">Open our code editor</a></p></div>
 <p><strong>Your challenge:</strong> Deploy the latest main branch with Update Preview, test /health, then Publish to Live. Never commit preview share tokens.</p>
-<details id="quiz18"><summary>Knowledge check: Is a CORS allowlist a substitute for user authentication?</summary><p>No. CORS controls which browsers can read cross-origin responses; it does not authenticate users.</p><button class="button small" type="button" data-share="#quiz18">Share this question</button></details>
+<details id="quiz18"><summary>Knowledge check: Does wildcard CORS provide user authentication?</summary><p>No. Wildcard CORS only permits browser access to public responses. Private user data requires proper authentication and authorization.</p><button class="button small" type="button" data-share="#quiz18">Share this question</button></details>
 <div class="course-footer"><div class="buttons" style="margin-top:0"><a class="button" href="#ch17">← Previous</a><a class="button primary" href="#ch19">Next lesson →</a></div><div class="buttons" style="margin-top:0"><a href="https://editor.learnwithchampak.live/" target="_blank" rel="noopener" class="button small">Our code editor</a><button type="button" class="button small" data-share="#ch18">Share chapter</button><a class="button small" target="_blank" rel="noopener" href="https://wa.me/?text=Deploy%20on%20GoDaddy%20%2B%20CORS%20%E2%80%94%20http%3A%2F%2Fnodeuse.learnwithchampak.live%2Flearn%2F%23ch18">WhatsApp</a><button type="button" class="button small" data-mark-complete>Mark chapter complete</button></div></div>
 </section>
 <section class="card course-chapter" id="ch19" data-chapter="19">
@@ -383,6 +382,7 @@ console.log(tasks);</code></pre></div>
 <p>The practice buttons use the <strong>published</strong> GoDaddy Node.js API below. GoDaddy preview links are private and can block public browser requests. To update the server, click <strong>Update Preview</strong> and then <strong>Publish to Live</strong> in GoDaddy. Do not include any preview sharing token.</p>
 <div class="api-line"><div class="form-field"><label for="api-url">GoDaddy API base URL</label><input type="url" id="api-url" placeholder="https://11vhaiejwu.c39.airoapp.ai" autocomplete="url"></div><button id="connect-api" type="button" class="button primary">Connect &amp; test</button><button id="api-reset" type="button" class="button">Reset URL</button></div>
 <div id="api-status" class="api-status" role="status" data-state="idle">Published API address selected; connection not yet verified.</div><pre class="terminal" id="api-response">Test /api/hello on the published GoDaddy app.</pre>
+<p class="notice"><strong>Deployment check:</strong> Open <a href="https://11vhaiejwu.c39.airoapp.ai/api/diagnostics" target="_blank" rel="noopener">/api/diagnostics</a> directly. The expected <code>apiVersion</code> is <code>2026-10-30-cors-fix</code> and <code>allowOrigin</code> is <code>*</code>. If the page fails to open, fix the published GoDaddy app first; that is not a browser CORS error. If it opens but shows a different version, publish the newest commit.</p>
 <div class="buttons"><a class="button primary" href="https://11vhaiejwu.c39.airoapp.ai/api/hello" target="_blank" rel="noopener">Open API directly</a><a class="button" href="https://11vhaiejwu.c39.airoapp.ai/health" target="_blank" rel="noopener">Open health check</a><a href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/index.js" class="button" target="_blank" rel="noopener">View all backend routes</a><a class="button" href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/index.test.js" target="_blank" rel="noopener">View automated tests</a><a class="button" href="https://editor.learnwithchampak.live/" target="_blank" rel="noopener">Our code editor</a></div></section>
 </main><aside class="course-toc"><div class="card"><strong>Lessons · 1 → 20</strong><a href="#ch1">1. Hello World</a>
 <a href="#ch2">2. Hello Name</a>
