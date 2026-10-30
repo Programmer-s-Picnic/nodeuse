@@ -25,9 +25,9 @@ nodeuse/
 
 ## Step 1: Enable GitHub Pages
 
-In this **nodeuse** repository open **Settings → Pages**. Select **Deploy from a branch**, **main**, **/(root)**, then save.
+In this **nodeuse** repository open **Settings → Pages**. Under **Build and deployment → Source**, select **GitHub Actions**. The included `.github/workflows/publish-pages.yml` publishes the static site on pushes to `main`; you can also use **Actions → Publish NodeUse learning site → Run workflow**. If you prefer branch publishing, select **Deploy from a branch → main → /(root)** instead. Use one publishing method consistently.
 
-The public address will be https://programmer-s-picnic.github.io/nodeuse/ after GitHub Pages publishes.
+The intended public address is https://programmer-s-picnic.github.io/nodeuse/ after a successful GitHub Pages deployment. Check the deployment job's actual Pages URL and status before sharing it as live.
 
 GitHub Pages serves static HTML/CSS/JavaScript from the repository; it does **not** execute `index.js`.
 
