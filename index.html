@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NodeUse — Task Manager and Node.js on GoDaddy | Programmer's Picnic</title>
+<meta name="description" content="Learn Node.js on GoDaddy from Hello World to Infinity while building a task manager. Connect GitHub Pages to your NodeUse server.">
+<meta name="author" content="Champak Roy">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://programmer-s-picnic.github.io/nodeuse/">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body data-root="./">
+<header class="sitebar"><div class="wrap">
+<a class="brand" href="index.html"><span class="brandmark">N</span>Programmer's Picnic · NodeUse</a>
+<nav aria-label="Main navigation"><a href="index.html" aria-current="page">Home</a><a href="task_entry/index.html">Task Entry</a><a href="all_task/index.html">All Tasks</a><a href="learn/index.html">0 → ∞ Lesson</a></nav>
+</div></header>
+<section class="hero"><div class="wrap"><p class="eyebrow">GoDaddy Node.js + GitHub Pages · Zero to Infinity</p>
+<h1>Learn Node.js by <span>building</span></h1>
+<p class="lead">Start with Hello World on your GoDaddy server, connect it to this GitHub Pages site, and build a Task Manager in stages.</p>
+<div class="buttons"><a class="button primary" href="learn/index.html">Start the 0 → ∞ course</a><a class="button" href="#connection">Test Hello World connection</a><a class="button" href="https://github.com/Programmer-s-Picnic/nodeuse">View source code</a></div>
+</div></section>
+<main class="wrap section">
+<section class="grid" aria-label="Task summary">
+<div class="stat"><strong data-count-all>0</strong><span>Total tasks</span></div>
+<div class="stat"><strong data-count-active>0</strong><span>Open tasks</span></div>
+<div class="stat"><strong data-count-done>0</strong><span>Completed tasks</span></div>
+</section>
+<div class="grid two" style="margin-top:20px">
+<section class="card"><span class="tag">Level 0 — browser forms</span><h2>Add a task</h2>
+<form data-task-form>
+<div class="form-grid">
+<div class="form-field wide"><label for="task-name">Task name</label><input id="task-name" name="name" placeholder="e.g. Test GoDaddy Hello World" maxlength="160" required></div>
+<div class="form-field wide"><label for="task-details">Details</label><textarea id="task-details" name="details" maxlength="2000" placeholder="What needs to be done?"></textarea></div>
+<div class="form-field"><label for="task-date">Due date and time</label><input type="datetime-local" id="task-date" name="date"></div>
+<div class="form-field"><label for="task-status">Status</label><select id="task-status" name="status"><option>Pending</option><option>In Progress</option><option>Completed</option></select></div>
+</div>
+<div class="buttons"><button class="button primary" type="submit"><span data-submit-label>Add task</span></button><button class="button outline" type="button" data-cancel-edit>Cancel edit</button><button class="button" type="reset">Clear</button></div>
+<p data-form-feedback role="status" aria-live="polite" class="muted smalltext">Tasks are saved locally in this browser, not on the GoDaddy server.</p>
+</form></section>
+<section class="card"><span class="tag">Your tasks</span><h2>Task list</h2>
+<div class="form-grid">
+<div class="form-field"><label for="task-search">Search</label><input id="task-search" type="search" placeholder="Search tasks"></div>
+<div class="form-field"><label for="status-filter">Filter</label><select id="status-filter"><option value="all">All statuses</option><option>Pending</option><option>In Progress</option><option>Completed</option></select></div>
+</div>
+<div data-task-list aria-live="polite"></div>
+<a class="button outline" href="all_task/index.html">See all tasks</a>
+</section></div>
+<section id="connection" class="card"><span class="tag">Level 1 — browser to GoDaddy API</span>
+<h2>Connect NodeUse to GoDaddy</h2>
+<p>Publish this repository as a Node.js App on GoDaddy, then click Connect &amp; test. The browser will request <code>/api/hello</code> from the server. The initial hostname below is suggested, not verified.</p>
+<div class="api-line">
+<div class="form-field"><label for="api-url">Published GoDaddy Node.js URL</label><input id="api-url" type="url" placeholder="https://cserver.learnwithchampak.live"></div>
+<button class="button primary" type="button" id="connect-api">Connect &amp; test</button>
+<button class="button outline" type="button" id="api-reset">Reset URL</button>
+</div>
+<div class="api-status" id="api-status" role="status" aria-live="polite" data-state="idle">GoDaddy hostname suggested; NodeUse connection not yet verified.</div>
+<pre class="terminal" id="api-response">Click Connect &amp; test after deploying the Node.js app.</pre>
+<div class="notice">GitHub Pages runs the frontend; GoDaddy runs Node.js. CORS must allow <code>https://programmer-s-picnic.github.io</code>. <a href="learn/index.html#ch6">Read the CORS lesson</a>.</div>
+</section>
+<section class="card"><h2>0 to Infinity learning roadmap</h2>
+<div class="grid">
+<div><h3>Levels 0–3</h3><p>Node.js basics, Hello World, HTTP, requests, responses and package.json.</p></div>
+<div><h3>Levels 4–7</h3><p>Deploy to GoDaddy, JSON, CORS and connect using fetch.</p></div>
+<div><h3>Levels 8–∞</h3><p>Tasks, CRUD, tests, REST APIs, databases, authentication and production systems.</p></div>
+</div>
+<div class="buttons"><a class="button primary" href="learn/index.html">Open all 13 chapters</a><a class="button" href="https://editor.learnwithchampak.live/">Our code editor</a></div>
+</section>
+</main>
+<footer><div class="wrap">Programmer's Picnic · Developed and maintained by Champak Roy · <a href="https://dsa.learnwithchampak.live/">DSA lesson library</a> · <a href="https://github.com/Programmer-s-Picnic/nodeuse">NodeUse GitHub repository</a></div></footer>
+<script defer src="assets/app.js"></script>
+</body>
+</html>
