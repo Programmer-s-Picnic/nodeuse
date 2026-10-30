@@ -27,7 +27,7 @@ const server = http.createServer((req, res) => {
 
   if (url.pathname === "/") {
     res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
-    return res.end("Hello World! Welcome to Programmer's Picnic.");
+    return res.end("Hello Champak");
   }
  
  
