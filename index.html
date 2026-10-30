@@ -48,13 +48,13 @@
 </section></div>
 <section id="connection" class="card"><span class="tag">Level 1 — browser to GoDaddy API</span>
 <h2>Connect NodeUse to GoDaddy</h2>
-<p>Publish this repository as a Node.js App on GoDaddy, then click Connect &amp; test. The browser will request <code>/api/hello</code> from the server. The published GoDaddy application hostname is prefilled below. Click Connect &amp; test to verify that the latest deployed app responds. Do not use a private preview URL or share token here.</p>
+<p>Publish this repository as a Node.js App on GoDaddy, then click Connect &amp; test. The browser will request <code>/api/hello</code> from the server. The GoDaddy preview address is prefilled below for testing. Click Connect &amp; test after deploying the latest preview. Preview access may require a GoDaddy login; do not put preview share tokens into the lesson.</p>
 <div class="api-line">
-<div class="form-field"><label for="api-url">Published GoDaddy Node.js URL</label><input id="api-url" type="url" placeholder="https://11vhaiejwu.c39.airoapp.ai"></div>
+<div class="form-field"><label for="api-url">GoDaddy Node.js preview URL</label><input id="api-url" type="url" placeholder="https://11vhaiejwu.preview.c39.airoapp.ai"></div>
 <button class="button primary" type="button" id="connect-api">Connect &amp; test</button>
 <button class="button outline" type="button" id="api-reset">Reset URL</button>
 </div>
-<div class="api-status" id="api-status" role="status" aria-live="polite" data-state="idle">Published app hostname configured; NodeUse API connection not yet verified.</div>
+<div class="api-status" id="api-status" role="status" aria-live="polite" data-state="idle">GoDaddy preview URL configured; API connection not yet verified.</div>
 <pre class="terminal" id="api-response">Click Connect &amp; test after deploying the Node.js app.</pre>
 <div class="notice">GitHub Pages runs the frontend; GoDaddy runs Node.js. CORS must allow <code>https://programmer-s-picnic.github.io</code>. <a href="learn/index.html#ch6">Read the CORS lesson</a>.</div>
 </section>
