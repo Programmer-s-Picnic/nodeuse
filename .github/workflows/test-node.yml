@@ -27,5 +27,6 @@ jobs:
           node --check index.test.js
           node --check assets/app.js
           node --check assets/lesson-demos.js
+          node --check assets/jsonp.js
       - name: Test all beginner API examples
         run: npm test
