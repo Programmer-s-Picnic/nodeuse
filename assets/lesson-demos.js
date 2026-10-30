@@ -23,7 +23,7 @@
     return value;
   };
   const routes = {
-    1: "/api/hello", 2: "/api/hello-name", 3: "/api/add",
+    1: "/api/hello", 2: "/", 3: "/api/add",
     4: "/api/subtract", 5: "/api/multiply", 6: "/api/divide",
     7: "/api/even-odd", 8: "/api/largest", 9: "/api/table",
     10: "/api/factorial", 11: "/api/fibonacci", 12: "/api/array-stats",
@@ -31,7 +31,7 @@
   };
   function runLocal(id, data) {
     if (id === 1) return { message: "Hello World!" };
-    if (id === 2) return { message: "Hello " + input(data, "name") + "!" };
+    if (id === 2) return { message: "Hello " + input(data, "name") };
     if ([3, 4, 5, 6].includes(id)) {
       const a = numeric(data, "a"), b = numeric(data, "b");
       if (id === 6 && b === 0) throw Error("Cannot divide by zero.");
@@ -125,12 +125,20 @@
             const response = await fetch(url.href, { signal: controller.signal, cache: "no-store", credentials: "omit" });
             const type = response.headers.get("content-type") || "";
             if (!type.includes("application/json")) {
-              const bodyText = await response.text();
-              if (bodyText.trim() === "Hello Champak") {
-                show("Stage 1 GoDaddy server responded:", "Hello Champak\n\nThis lesson's dedicated API route is not yet implemented. Use Run in browser for the calculation.");
+              const greeting = await response.text();
+              if (id === 2 && greeting.trim() === "Hello " + fields.name.trim()) {
+                show("Real GoDaddy Hello Name response:", greeting.trim());
                 return;
               }
-              throw Error("The server returned non-JSON content.");
+              if (id === 1 && greeting.trim() === "Hello Champak") {
+                show("Real GoDaddy greeting:", greeting.trim());
+                return;
+              }
+              if (greeting.trim().startsWith("Hello ")) {
+                show("GoDaddy server responded, but this API exercise is not implemented yet:", greeting.trim());
+                return;
+              }
+              throw Error("Unexpected non-JSON response from GoDaddy.");
             }
             const body = await response.json();
             if (!response.ok) throw Error(body.error || "HTTP " + response.status);
