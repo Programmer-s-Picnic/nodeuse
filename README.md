@@ -5,7 +5,8 @@
 - **GitHub Pages frontend (custom domain):** http://nodeuse.learnwithchampak.live/
 - **Complete 13-chapter 0 → ∞ course:** http://nodeuse.learnwithchampak.live/learn/
 - **GitHub source (frontend + backend):** https://github.com/Programmer-s-Picnic/nodeuse
-- **GoDaddy app public hostname shown in dashboard:** https://11vhaiejwu.c39.airoapp.ai (HTTP/API response not independently verified)
+- **GoDaddy preview API URL for this lesson:** https://11vhaiejwu.preview.c39.airoapp.ai (response not independently verified)
+- **GoDaddy published-app hostname:** https://11vhaiejwu.c39.airoapp.ai (use for public production integrations after validation)
 - **Private preview:** preview environment, accessed from GoDaddy dashboard. Do not commit or publish preview share tokens.
 
 ## Project structure
@@ -39,7 +40,7 @@ GitHub Pages serves static HTML/CSS/JavaScript from the repository; it does **no
 3. Build command: `npm run build`; start command: `npm start`. The server listens on `process.env.PORT`.
 4. Preview, then publish. Use the **public HTTPS hostname** shown in the dashboard, not the private preview URL or its share token. The known published hostname is `https://11vhaiejwu.c39.airoapp.ai`.
 5. Check endpoints: `/` (Hello World), `/api/hello` (JSON), `/health` (JSON health).
-6. Go to the GitHub Pages frontend, enter the published GoDaddy base URL in the connection tester, and click **Connect & test**. The prefilled published hostname is not proof that the newest API release is live; click **Connect & test** to verify.
+6. Go to the GitHub Pages frontend. The connection tester is prefilled with the preview API URL `https://11vhaiejwu.preview.c39.airoapp.ai`. Click **Connect & test** to validate. GoDaddy may require a preview session, and the public lesson cannot safely embed a preview sharing token. For production use the published hostname after verification.
 
 ## Run and test locally (Node.js 22)
 
