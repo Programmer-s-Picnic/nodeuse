@@ -23,17 +23,17 @@ const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://localhost");
 
     const name = url.searchParams.get("name") || "Champak";
+    var a=Number(query.a);
+    var b=Number(query.b);
+
+    var result=a+b;
 
     // Return greeting
     res.writeHead(200, {
         "Content-Type": "text/plain; charset=utf-8"
     });
 
-    //res.end("Hello " + name+" Ji");
-    var a;
-    var b;
-    var result;
-    result=a+b;
+    res.end("Hello " + name+" Ji");
 
     res.end("Result : "+result);
 
