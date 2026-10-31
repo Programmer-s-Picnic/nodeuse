@@ -25,7 +25,7 @@ const server = http.createServer((req, res) => {
     const name = url.searchParams.get("name") || "Champak";
     const a=Number(url.searchParams.get("a"));
     const b=Number(url.searchParams.get("b"));
-    const n=Number(url.searchParam.get("n"));
+    const n=Number(url.searchParams.get("n"));
 
     
     // let result= `A=${a} ==B=${b}`;
