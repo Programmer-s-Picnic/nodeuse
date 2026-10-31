@@ -63,7 +63,7 @@ const server = http.createServer((req, res) => {
 if(path=="/sql"){
   let pool="Connection";
   try{
-  pool =  new sql.ConnectionPool(config).connect();
+  pool =await  new sql.ConnectionPool(config).connect();
     res.end(`SQL` + path + pool);
   }catch (error) {
     res.end(`SQL` + path + error);
