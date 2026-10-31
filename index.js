@@ -36,11 +36,19 @@ const server = http.createServer((req, res) => {
     //     result= `A=${a} <B=${b}`;
     // }
 
-var fact = 1;
+// var fact = 1;
+    
 
-for(let i=1;i<=n;i++){
-    fact = fact*i;
-}
+// for(let i=1;i<=n;i++){
+//     fact = fact*i;
+// }
+ let result;
+     else if (n % 2 === 0) {
+        result = n + " is Even Number";
+    }
+    else {
+        result = n + " is Odd Number";
+    }
     
 
     // Return greeting
@@ -50,7 +58,8 @@ for(let i=1;i<=n;i++){
 
 //    res.end("Hello " + name+" Ji");
 // res.end("Result :" +result);
-    res.end("Factorial : " + fact);
+    // res.end("Factorial : " + fact);
+    res.end("Number :" +result);
     
 
 });
