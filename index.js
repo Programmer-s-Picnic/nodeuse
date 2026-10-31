@@ -25,15 +25,15 @@ const server = http.createServer((req, res) => {
     const name = url.searchParams.get("name") || "Champak";
     var a=Number(url.searchParams.get("a"));
     var b=Number(url.searchParams.get("b"));
-
+var result="equal";
     if(a>b){
-        res.end("Large number :" +a);
+        result "a>b";
     }
     else if(b>a){
-        res.end(" Large number :" +b);
+        result="b>a";
     }
     
-        res.end("Equle number ");
+        res.end(result);
     
    
 
