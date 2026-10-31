@@ -49,15 +49,15 @@ const server = http.createServer((req, res) => {
     //     i++;
     // }
 
-    let result;
-    if(n%2===0)
-    {
-       result="Even Number";
-    }else{
-        result="Odd Number";
-    }
+    // let result;
+    // if(n%2===0)
+    // {
+    //    result="Even Number";
+    // }else{
+    //     result="Odd Number";
+    // }
     
-    
+    result=a*b;
     
 
     // Return greeting
@@ -69,7 +69,8 @@ const server = http.createServer((req, res) => {
 // res.end("Result :" +result);
     // res.end("Factorial : " + fact);
 
-    res.end("Result :"+result);
+    // res.end("Result :"+result);
+    res.end("Multiple :" +result);
      
     
 
