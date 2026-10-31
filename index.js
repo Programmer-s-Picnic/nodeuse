@@ -25,17 +25,22 @@ const server = http.createServer((req, res) => {
     const name = url.searchParams.get("name") || "Champak";
     const a=Number(url.searchParams.get("a"));
     const b=Number(url.searchParams.get("b"));
-let result= `A=${a} ==B=${b}`;
-    if(a>b){
-        result= `A=${a} >B=${b}`;
-    }
-    else if(b>a){
-        result= `A=${a} <B=${b}`;
+    const n=Number(url.searchParam.get("n"));
+
+    
+    // let result= `A=${a} ==B=${b}`;
+    // if(a>b){
+    //     result= `A=${a} >B=${b}`;
+    // }
+    // else if(b>a){
+    //     result= `A=${a} <B=${b}`;
+    // }
+
+    var fact=1;
+    for(int i=1;i<=n;i++){
+        fact=fact*i;
     }
     
-        
-    
-   
 
     // Return greeting
     res.writeHead(200, {
@@ -43,7 +48,8 @@ let result= `A=${a} ==B=${b}`;
     });
 
 //    res.end("Hello " + name+" Ji");
-res.end("Result :" +result);
+// res.end("Result :" +result);
+    res.end("Factorial : " + fact);
     
 
 });
