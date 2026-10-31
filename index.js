@@ -3,8 +3,10 @@
 
 const http = require("node:http");
 const sql = require("mssql");
+
 const PORT = Number(process.env.PORT) || 3000;
 
+// Microsoft SQL Server configuration
 const config = {
     server: "SG2NWPLS19SQL-v09.mssql.shr.prod.sin2.secureserver.net",
     port: 1433,
@@ -21,9 +23,10 @@ const config = {
     requestTimeout: 30000
 };
 
-const server = http.createServer((req, res) => {
+// Create HTTP server
+const server = http.createServer(async (req, res) => {
 
-    // Allow requests from GitHub Pages
+    // CORS for GitHub Pages
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -34,16 +37,34 @@ const server = http.createServer((req, res) => {
         return;
     }
 
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+
+    // Read URL and path
     const url = new URL(req.url, "http://localhost");
     const path = url.pathname;
 
-    res.setHeader("Content-Type", "text/plain; charset=utf-8");
-
+    // SQL Server connection
     if (path === "/sql") {
 
-        res.end("SQL configuration ready. Database not connected yet.");
+        try {
+            const pool = await sql.connect(config);
 
-    } else if (path === "/add") {
+            const result = await pool.request().query("SELECT 1 AS connected");
+
+            res.end("SQL Server Connected Successfully!");
+
+        } catch (err) {
+
+            console.error("SQL Error:", err);
+            res.statusCode = 500;
+            res.end("SQL Connection Failed. Check server logs.");
+
+        }
+
+    }
+
+    // Addition
+    else if (path === "/add") {
 
         const a = Number(url.searchParams.get("a"));
         const b = Number(url.searchParams.get("b"));
@@ -59,7 +80,10 @@ const server = http.createServer((req, res) => {
 
         res.end("Sum: " + (a + b));
 
-    } else if (path === "/sub") {
+    }
+
+    // Subtraction
+    else if (path === "/sub") {
 
         const a = Number(url.searchParams.get("a"));
         const b = Number(url.searchParams.get("b"));
@@ -75,7 +99,10 @@ const server = http.createServer((req, res) => {
 
         res.end("Difference: " + (a - b));
 
-    } else if (path === "/factorial") {
+    }
+
+    // Factorial
+    else if (path === "/factorial") {
 
         const n = Number(url.searchParams.get("n"));
 
@@ -95,7 +122,10 @@ const server = http.createServer((req, res) => {
 
         res.end("Factorial: " + fact);
 
-    } else if (path === "/even-odd") {
+    }
+
+    // Even or Odd
+    else if (path === "/even-odd") {
 
         const n = Number(url.searchParams.get("n"));
 
@@ -112,7 +142,10 @@ const server = http.createServer((req, res) => {
             res.end("Odd Number!");
         }
 
-    } else {
+    }
+
+    // Default route
+    else {
 
         res.end("Party karo " + path);
 
@@ -122,9 +155,11 @@ const server = http.createServer((req, res) => {
 
 // Start server
 if (require.main === module) {
+
     server.listen(PORT, "0.0.0.0", () => {
         console.log("Server running on port " + PORT);
     });
+
 }
 
 module.exports = { server };
