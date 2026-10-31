@@ -23,10 +23,10 @@ const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://localhost");
 
     const name = url.searchParams.get("name") || "Champak";
-    //var a=Number(url.searchParams.get("a"));
-    //var b=Number(url.searchParams.get("b"));
+    var a=Number(url.searchParams.get("a"));
+    var b=Number(url.searchParams.get("b"));
 
-    //var result=a+b;
+    var result=a+b;
 
     // Return greeting
     res.writeHead(200, {
@@ -35,7 +35,7 @@ const server = http.createServer((req, res) => {
 
     res.end("Hello " + name+" Ji");
 
-    //res.end("Result : "+result);
+    res.end("Result : "+result);
 
 });
 
