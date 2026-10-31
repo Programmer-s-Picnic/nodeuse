@@ -27,7 +27,7 @@ const server = http.createServer((req, res) => {
     const b=Number(url.searchParams.get("b"));
 let result="equal";
     if(a>b){
-        result "a>b";
+        result= "a>b";
     }
     else if(b>a){
         result="b>a";
