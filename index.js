@@ -23,9 +23,9 @@ const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://localhost");
 
     const name = url.searchParams.get("name") || "Champak";
-    var a=Number(url.searchParams.get("a"));
-    var b=Number(url.searchParams.get("b"));
-var result="equal";
+    const a=Number(url.searchParams.get("a"));
+    const b=Number(url.searchParams.get("b"));
+let result="equal";
     if(a>b){
         result "a>b";
     }
@@ -33,7 +33,7 @@ var result="equal";
         result="b>a";
     }
     
-        res.end(result);
+        
     
    
 
@@ -43,7 +43,7 @@ var result="equal";
     });
 
 //    res.end("Hello " + name+" Ji");
-
+res.end(result);
     
 
 });
