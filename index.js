@@ -12,7 +12,7 @@ const config = {
     port: 1433,
     database: "testwhatsapp",
     user: "testwhatsapp",
-    password: process.env.DB_PASSWORD,
+    password: "M%E4Zn3li3oxjkp_",
 
     options: {
         encrypt: true,
