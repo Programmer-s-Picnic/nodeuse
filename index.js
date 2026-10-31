@@ -21,13 +21,21 @@ const server = http.createServer((req, res) => {
 
     // Read name from URL
     const url = new URL(req.url, "http://localhost");
+    const path=url.pathname;
 
     res.writeHead(200, {
         "Content-Type": "text/plain; charset=utf-8"
     });
 
-
-     res.end(`${url.pathname}`);
+if(path=="/add"){
+    res.end(`Jodo`);
+}
+    else
+    if(path=="/sub"){
+    res.end(`Ghatao`);
+}
+    else
+     res.end(`Party karo`);
     
      
     
