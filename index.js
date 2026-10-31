@@ -32,9 +32,9 @@ const server = http.createServer((req, res) => {
     else if(b>a){
         res.end(" Large number :" +b);
     }
-    else{
+    
         res.end("Equle number ");
-    }
+    
    
 
     // Return greeting
