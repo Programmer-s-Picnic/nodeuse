@@ -43,7 +43,7 @@ let result="equal";
     });
 
 //    res.end("Hello " + name+" Ji");
-res.end(result);
+res.end("Result :" +result);
     
 
 });
