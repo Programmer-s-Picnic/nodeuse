@@ -23,8 +23,8 @@ const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://localhost");
 
     const name = url.searchParams.get("name") || "Champak";
-    var a;
-    var b;
+    var a=10;
+    var b=20;
 
     var result=a+b;
 
