@@ -2,26 +2,18 @@
 "use strict";
 
 const http = require("node:http");
-const sql = require("mssql");
+ import mysql from 'mysql2/promise';
+
+const connection = await mysql.createConnection({
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT || '3306'),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
+});
 
 const PORT = Number(process.env.PORT) || 3000;
 
-// Microsoft SQL Server configuration
-const config = {
-    server: "SG2NWPLS19SQL-v09.mssql.shr.prod.sin2.secureserver.net",
-    port: 1433,
-    database: "testwhatsapp",
-    user: "testwhatsapp",
-    password: "M%E4Zn3li3oxjkp_",
-
-    options: {
-        encrypt: true,
-        trustServerCertificate: true
-    },
-
-    connectionTimeout: 30000,
-    requestTimeout: 30000
-};
 
 // Create HTTP server
 const server = http.createServer(async (req, res) => {
@@ -44,30 +36,11 @@ const server = http.createServer(async (req, res) => {
     const path = url.pathname;
 
     // SQL Server connection
-    if (path === "/sql") {
-
-        try {
-            const pool = await sql.connect(config);
-
-            
-
-            res.end("SQL Server Connected Successfully!" + pool);
-
-        } catch (err) {
-
-            
-            res.end("SQL Connection Failed. Check server logs." + err);
-
-        }
-
-    }
-
-    // Default route
-    else {
+    
 
         res.end("Party karo " + path);
 
-    }
+    
 
 });
 
