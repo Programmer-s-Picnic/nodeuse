@@ -26,7 +26,16 @@ const server = http.createServer((req, res) => {
     var a=Number(url.searchParams.get("a"));
     var b=Number(url.searchParams.get("b"));
 
-    var result=a+b;
+    if(a>b){
+        res.end("Large number :" +a);
+    }
+    else if(b>a){
+        res.end(" Large number :" +b);
+    }
+    else{
+        res.end("Equle number ");
+    }
+   
 
     // Return greeting
     res.writeHead(200, {
@@ -35,7 +44,7 @@ const server = http.createServer((req, res) => {
 
 //    res.end("Hello " + name+" Ji");
 
-    res.end("Result : "+result);
+    
 
 });
 
