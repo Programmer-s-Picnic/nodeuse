@@ -73,7 +73,7 @@ let pool =  new sql.ConnectionPool(config).connect().then(
 {
   res.end(error);
 }
-// res.end(`SQL` + pool);
+ res.end(`SQL` + pool);
   
 }
   else
