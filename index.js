@@ -38,8 +38,8 @@ const server = http.createServer((req, res) => {
 
 var fact = 1;
 
-for (let i = 1; i <= n; i++) {
-    fact = fact * i;
+for(let i=1;i<=n;i++){
+    fact = fact*i;
 }
     
 
