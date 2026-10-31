@@ -36,10 +36,11 @@ const server = http.createServer((req, res) => {
     //     result= `A=${a} <B=${b}`;
     // }
 
-    var fact=1;
-    for(int i=1;i<=n;i++){
-        fact=fact*i;
-    }
+var fact = 1;
+
+for (let i = 1; i <= n; i++) {
+    fact = fact * i;
+}
     
 
     // Return greeting
