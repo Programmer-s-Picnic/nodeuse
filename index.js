@@ -73,6 +73,27 @@ if(path=="/add"){
     if(path=="/sub"){
     res.end(`Ghatao` + path);
 }
+else if(path=="/factorial"){
+
+  const n=Number(url.searchParams.get("n"));
+  var fact=1;
+  
+  for(let i=1;i<=n;i++){
+  fact=fact*i;
+  }
+  res.end("Factorial : "+fact);
+  }
+
+  else if(path=="/even-odd"){
+  const n=Number(searchParams.get("n"));
+  
+  if(n%2===0){
+    res.end("Even Number !");
+    }
+    else{
+      res.end("Odd Number !");
+    }
+  }
     else
      res.end(`Party karo` + path);
     
