@@ -66,81 +66,35 @@ const server = http.createServer(async (req, res) => {
     // Addition
     else if (path === "/add") {
 
-        const a = Number(url.searchParams.get("a"));
-        const b = Number(url.searchParams.get("b"));
-
-        if (!url.searchParams.has("a") ||
-            !url.searchParams.has("b") ||
-            !Number.isFinite(a) ||
-            !Number.isFinite(b)) {
-            res.statusCode = 400;
-            res.end("Provide valid numbers a and b");
-            return;
-        }
-
-        res.end("Sum: " + (a + b));
+       
+        res.end("Add: " );
 
     }
 
     // Subtraction
     else if (path === "/sub") {
 
-        const a = Number(url.searchParams.get("a"));
-        const b = Number(url.searchParams.get("b"));
+   
 
-        if (!url.searchParams.has("a") ||
-            !url.searchParams.has("b") ||
-            !Number.isFinite(a) ||
-            !Number.isFinite(b)) {
-            res.statusCode = 400;
-            res.end("Provide valid numbers a and b");
-            return;
-        }
-
-        res.end("Difference: " + (a - b));
+        res.end("Difference: ");
 
     }
 
     // Factorial
     else if (path === "/factorial") {
 
-        const n = Number(url.searchParams.get("n"));
+     
 
-        if (!url.searchParams.has("n") ||
-            !Number.isInteger(n) ||
-            n < 0 || n > 170) {
-            res.statusCode = 400;
-            res.end("Provide an integer n between 0 and 170");
-            return;
-        }
-
-        let fact = 1;
-
-        for (let i = 1; i <= n; i++) {
-            fact = fact * i;
-        }
-
-        res.end("Factorial: " + fact);
+        res.end("Factorial: ");
 
     }
 
     // Even or Odd
     else if (path === "/even-odd") {
 
-        const n = Number(url.searchParams.get("n"));
-
-        if (!url.searchParams.has("n") ||
-            !Number.isSafeInteger(n)) {
-            res.statusCode = 400;
-            res.end("Provide a valid integer n");
-            return;
-        }
-
-        if (n % 2 === 0) {
-            res.end("Even Number!");
-        } else {
+   
             res.end("Odd Number!");
-        }
+        
 
     }
 
