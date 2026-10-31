@@ -64,14 +64,14 @@ if(path=="/sql"){
   let pool="Connection";
   
 try{
-let pool =  new sql.ConnectionPool(config).connect().then(
-  value=>{
-    res.end(`${value}`);
-  }
-);
+// let pool =  new sql.ConnectionPool(config).connect().then(
+//   value=>{
+//     res.end(`${value}`);
+//   }
+// );
 }catch(error)
 {
-  res.end(error);
+//  res.end(error);
 }
  res.end(`SQL` + pool);
   
