@@ -29,7 +29,13 @@ const server = http.createServer((req, res) => {
         "Content-Type": "text/plain; charset=utf-8"
     });
 
-    res.end("Hello " + name+" Ji");
+    //res.end("Hello " + name+" Ji");
+    var a;
+    var b;
+    var result;
+    result=a+b;
+
+    res.end("Result : "+result);
 
 });
 
