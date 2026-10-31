@@ -59,19 +59,20 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, {
         "Content-Type": "text/plain; charset=utf-8"
     });
+  
 if(path=="/sql"){
-    res.end(`SQL`);
+    res.end(`SQL` + path);
 }
   else
 if(path=="/add"){
-    res.end(`Jodo`);
+    res.end(`Jodo` + path);
 }
     else
     if(path=="/sub"){
-    res.end(`Ghatao`);
+    res.end(`Ghatao` + path);
 }
     else
-     res.end(`Party karo`);
+     res.end(`Party karo` + path);
     
      
     
