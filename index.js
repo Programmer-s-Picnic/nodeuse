@@ -41,13 +41,22 @@ const server = http.createServer((req, res) => {
 //     fact = fact*i;
 // }
 
-     var fact =1;
-     var i=1;
+    //  var fact =1;
+    //  var i=1;
 
-    while(i<=n){
-        fact=fact*i;
-        i++;
+    // while(i<=n){
+    //     fact=fact*i;
+    //     i++;
+    // }
+
+    let result;
+    if(n%2===0)
+    {
+       result="Even Number";
+    }else{
+        result="Odd Number";
     }
+    
     
     
 
@@ -58,7 +67,9 @@ const server = http.createServer((req, res) => {
 
 //    res.end("Hello " + name+" Ji");
 // res.end("Result :" +result);
-    res.end("Factorial : " + fact);
+    // res.end("Factorial : " + fact);
+
+    res.end("Result :"+result);
      
     
 
