@@ -23,8 +23,8 @@ const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://localhost");
 
     const name = url.searchParams.get("name") || "Champak";
-    //const a=Number(url.searchParams.get("a"));
-    //const b=Number(url.searchParams.get("b"));
+    const a=Number(url.searchParams.get("a"));
+    const b=Number(url.searchParams.get("b"));
     const n=Number(url.searchParams.get("n"));
 
     
@@ -43,12 +43,7 @@ const server = http.createServer((req, res) => {
 //     fact = fact*i;
 // }
 
-     else if (n % 2 === 0) {
-        result = n + " is Even Number";
-    }
-    else {
-        result = n + " is Odd Number";
-    }
+     
     
 
     // Return greeting
@@ -59,7 +54,7 @@ const server = http.createServer((req, res) => {
 //    res.end("Hello " + name+" Ji");
 // res.end("Result :" +result);
     // res.end("Factorial : " + fact);
-    res.end("Number :" +result);
+     
     
 
 });
