@@ -35,15 +35,20 @@ const server = http.createServer((req, res) => {
     // else if(b>a){
     //     result= `A=${a} <B=${b}`;
     // }
-
-// var fact = 1;
     
 
 // for(let i=1;i<=n;i++){
 //     fact = fact*i;
 // }
 
-     
+     var fact =1;
+     var i=1;
+
+    while(i<=n){
+        fact=fact*i;
+        i++;
+    }
+    
     
 
     // Return greeting
@@ -53,7 +58,7 @@ const server = http.createServer((req, res) => {
 
 //    res.end("Hello " + name+" Ji");
 // res.end("Result :" +result);
-    // res.end("Factorial : " + fact);
+    res.end("Factorial : " + fact);
      
     
 
