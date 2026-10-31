@@ -49,52 +49,16 @@ const server = http.createServer(async (req, res) => {
         try {
             const pool = await sql.connect(config);
 
-            const result = await pool.request().query("SELECT 1 AS connected");
+            
 
             res.end("SQL Server Connected Successfully!");
 
         } catch (err) {
 
-            console.error("SQL Error:", err);
-            res.statusCode = 500;
+            
             res.end("SQL Connection Failed. Check server logs.");
 
         }
-
-    }
-
-    // Addition
-    else if (path === "/add") {
-
-       
-        res.end("Add: " );
-
-    }
-
-    // Subtraction
-    else if (path === "/sub") {
-
-   
-
-        res.end("Difference: ");
-
-    }
-
-    // Factorial
-    else if (path === "/factorial") {
-
-     
-
-        res.end("Factorial: ");
-
-    }
-
-    // Even or Odd
-    else if (path === "/even-odd") {
-
-   
-            res.end("Odd Number!");
-        
 
     }
 
