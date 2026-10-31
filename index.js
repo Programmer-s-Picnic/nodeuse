@@ -5,6 +5,35 @@ const express = require('express');
 const app = express();
 
 
+
+
+
+
+const config = {
+  server: "SG2NWPLS19SQL-v09.mssql.shr.prod.sin2.secureserver.net",
+  port: 1433,
+  database: "testwhatsapp",
+  user: "testwhatsapp",
+  password: "M%E4Zn3li3oxjkp_",
+
+  options: {
+    encrypt: true,
+    trustServerCertificate: true
+  },
+
+  connectionTimeout: 30000,
+  requestTimeout: 30000
+};
+
+
+
+
+
+
+
+
+
+
 const http = require("node:http");
 
 const PORT = Number(process.env.PORT) || 3000;
