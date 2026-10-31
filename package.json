@@ -1,25 +1,19 @@
+
 {
-  "name": "nodeuse-hello-api",
+  "name": "node-mysql-test",
   "version": "1.0.0",
-  "private": true,
-  "description": "GoDaddy Node.js Hello World backend for Programmer's Picnic NodeUse lesson",
+  "description": "Node.js HTTP server with hosted MySQL database connectivity",
   "main": "index.js",
-  "engines": {
-    "node": "22.x"
-  },
+  "type": "commonjs",
   "scripts": {
-    "build": "echo build",
     "start": "node index.js",
-    "test": "node --test"
+    "dev": "node --watch index.js"
   },
   "dependencies": {
-    "ejs": "^3.1.10",
-    "express": "^5.1.0",
-    "mssql": "^12.7.3",
-    "sqlite3": "^6.0.1"
+    "mysql2": "^3.15.0"
   },
-
-   "allowScripts": {
-    "mssql@12.7.3": true
-  }
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "private": true
 }
