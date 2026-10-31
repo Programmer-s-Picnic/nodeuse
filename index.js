@@ -57,7 +57,7 @@ const server = http.createServer((req, res) => {
     //     result="Odd Number";
     // }
     
-    result=a*b;
+    
     
 
     // Return greeting
@@ -70,7 +70,7 @@ const server = http.createServer((req, res) => {
     // res.end("Factorial : " + fact);
 
     // res.end("Result :"+result);
-    res.end("Multiple :" +result);
+    
      
     
 
