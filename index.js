@@ -62,16 +62,7 @@ const server = http.createServer((req, res) => {
   
 if(path=="/sql"){
   let pool="Connection";
-  try{
-
-    res.end(`SQL` + path + pool);
-  }catch (error) {
-    res.end(`SQL` + path + error);
-  }
-   finally {
- //   if (pool) await pool.close();
-    
-  }
+ res.end(`SQL` + pool);
   
 }
   else
