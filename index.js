@@ -29,7 +29,7 @@ const server = http.createServer((req, res) => {
         "Content-Type": "text/plain; charset=utf-8"
     });
 
-    res.end("Hello " + name);
+    res.end("Hi " + name);
 
 });
 
