@@ -22,54 +22,12 @@ const server = http.createServer((req, res) => {
     // Read name from URL
     const url = new URL(req.url, "http://localhost");
 
-    const name = url.searchParams.get("name") || "Champak";
-    const a=Number(url.searchParams.get("a"));
-    const b=Number(url.searchParams.get("b"));
-    const n=Number(url.searchParams.get("n"));
-
-    
-    // let result= `A=${a} ==B=${b}`;
-    // if(a>b){
-    //     result= `A=${a} >B=${b}`;
-    // }
-    // else if(b>a){
-    //     result= `A=${a} <B=${b}`;
-    // }
-    
-
-// for(let i=1;i<=n;i++){
-//     fact = fact*i;
-// }
-
-    //  var fact =1;
-    //  var i=1;
-
-    // while(i<=n){
-    //     fact=fact*i;
-    //     i++;
-    // }
-
-    // let result;
-    // if(n%2===0)
-    // {
-    //    result="Even Number";
-    // }else{
-    //     result="Odd Number";
-    // }
-    
-    
-    
-
-    // Return greeting
     res.writeHead(200, {
         "Content-Type": "text/plain; charset=utf-8"
     });
 
-//    res.end("Hello " + name+" Ji");
-// res.end("Result :" +result);
-    // res.end("Factorial : " + fact);
 
-    // res.end("Result :"+result);
+     res.end(url);
     
      
     
