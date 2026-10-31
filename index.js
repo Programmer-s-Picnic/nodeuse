@@ -56,7 +56,7 @@ const server = http.createServer(async (req, res) => {
         } catch (err) {
 
             
-            res.end("SQL Connection Failed. Check server logs.");
+            res.end("SQL Connection Failed. Check server logs." + err);
 
         }
 
