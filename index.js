@@ -23,8 +23,8 @@ const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://localhost");
 
     const name = url.searchParams.get("name") || "Champak";
-    const a=Number(url.searchParams.get("a"));
-    const b=Number(url.searchParams.get("b"));
+    //const a=Number(url.searchParams.get("a"));
+    //const b=Number(url.searchParams.get("b"));
     const n=Number(url.searchParams.get("n"));
 
     
@@ -42,7 +42,7 @@ const server = http.createServer((req, res) => {
 // for(let i=1;i<=n;i++){
 //     fact = fact*i;
 // }
- let result;
+
      else if (n % 2 === 0) {
         result = n + " is Even Number";
     }
