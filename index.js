@@ -1,42 +1,25 @@
 
 "use strict";
-const { ename } = require('ejs');
-const express = require('express');
-const app = express();
-
-
-
-
-
-
-const config = {
-  server: "SG2NWPLS19SQL-v09.mssql.shr.prod.sin2.secureserver.net",
-  port: 1433,
-  database: "testwhatsapp",
-  user: "testwhatsapp",
-  password: "M%E4Zn3li3oxjkp_",
-
-  options: {
-    encrypt: true,
-    trustServerCertificate: true
-  },
-
-  connectionTimeout: 30000,
-  requestTimeout: 30000
-};
-
-
-
-
-
-
-
-
-
 
 const http = require("node:http");
 
 const PORT = Number(process.env.PORT) || 3000;
+
+const config = {
+    server: "SG2NWPLS19SQL-v09.mssql.shr.prod.sin2.secureserver.net",
+    port: 1433,
+    database: "testwhatsapp",
+    user: "testwhatsapp",
+    password: process.env.DB_PASSWORD,
+
+    options: {
+        encrypt: true,
+        trustServerCertificate: true
+    },
+
+    connectionTimeout: 30000,
+    requestTimeout: 30000
+};
 
 const server = http.createServer((req, res) => {
 
@@ -45,61 +28,95 @@ const server = http.createServer((req, res) => {
     res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    // Handle CORS preflight requests
     if (req.method === "OPTIONS") {
         res.writeHead(204);
         res.end();
         return;
     }
 
-    // Read name from URL
     const url = new URL(req.url, "http://localhost");
-    const path=url.pathname;
+    const path = url.pathname;
 
-    res.writeHead(200, {
-        "Content-Type": "text/plain; charset=utf-8"
-    });
-  
-if(path=="/sql"){
-  let pool="Connection";
-  
- res.end(`SQL` + pool);
-  
-}
-  else
-if(path=="/add"){
-    res.end(`Jodo` + path);
-}
-    else
-    if(path=="/sub"){
-    res.end(`Ghatao` + path);
-}
-else if(path=="/factorial"){
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
 
-  const n=Number(url.searchParams.get("n"));
-  var fact=1;
-  
-  for(let i=1;i<=n;i++){
-  fact=fact*i;
-  }
-  res.end("Factorial : "+fact);
-  }
+    if (path === "/sql") {
 
-  else if(path=="/even-odd"){
-  const n=Number(searchParams.get("n"));
-  
-   if(n%2===0){
-    res.end("Even Number !");
+        res.end("SQL configuration ready. Database not connected yet.");
+
+    } else if (path === "/add") {
+
+        const a = Number(url.searchParams.get("a"));
+        const b = Number(url.searchParams.get("b"));
+
+        if (!url.searchParams.has("a") ||
+            !url.searchParams.has("b") ||
+            !Number.isFinite(a) ||
+            !Number.isFinite(b)) {
+            res.statusCode = 400;
+            res.end("Provide valid numbers a and b");
+            return;
+        }
+
+        res.end("Sum: " + (a + b));
+
+    } else if (path === "/sub") {
+
+        const a = Number(url.searchParams.get("a"));
+        const b = Number(url.searchParams.get("b"));
+
+        if (!url.searchParams.has("a") ||
+            !url.searchParams.has("b") ||
+            !Number.isFinite(a) ||
+            !Number.isFinite(b)) {
+            res.statusCode = 400;
+            res.end("Provide valid numbers a and b");
+            return;
+        }
+
+        res.end("Difference: " + (a - b));
+
+    } else if (path === "/factorial") {
+
+        const n = Number(url.searchParams.get("n"));
+
+        if (!url.searchParams.has("n") ||
+            !Number.isInteger(n) ||
+            n < 0 || n > 170) {
+            res.statusCode = 400;
+            res.end("Provide an integer n between 0 and 170");
+            return;
+        }
+
+        let fact = 1;
+
+        for (let i = 1; i <= n; i++) {
+            fact = fact * i;
+        }
+
+        res.end("Factorial: " + fact);
+
+    } else if (path === "/even-odd") {
+
+        const n = Number(url.searchParams.get("n"));
+
+        if (!url.searchParams.has("n") ||
+            !Number.isSafeInteger(n)) {
+            res.statusCode = 400;
+            res.end("Provide a valid integer n");
+            return;
+        }
+
+        if (n % 2 === 0) {
+            res.end("Even Number!");
+        } else {
+            res.end("Odd Number!");
+        }
+
+    } else {
+
+        res.end("Party karo " + path);
+
     }
-    else{
-      res.end("Odd Number !");
-    }
-  }
-    else
-     res.end(`Party karo` + path);
-    
-     
-    
 
 });
 
