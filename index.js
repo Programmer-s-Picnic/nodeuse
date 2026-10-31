@@ -87,7 +87,7 @@ else if(path=="/factorial"){
   else if(path=="/even-odd"){
   const n=Number(searchParams.get("n"));
   
-  if(n%2===0){
+   if(n%2===0){
     res.end("Even Number !");
     }
     else{
