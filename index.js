@@ -25,12 +25,12 @@ const server = http.createServer((req, res) => {
     const name = url.searchParams.get("name") || "Champak";
     const a=Number(url.searchParams.get("a"));
     const b=Number(url.searchParams.get("b"));
-let result="equal";
+let result= `A=${a} ==B=${b}`;
     if(a>b){
-        result= "a>b";
+        result= `A=${a} >B=${b}`;
     }
     else if(b>a){
-        result="b>a";
+        result= `A=${a} <B=${b}`;
     }
     
         
