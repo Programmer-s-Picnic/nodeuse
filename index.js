@@ -22,11 +22,20 @@ const server = http.createServer(async (req, res) => {
 
     const url = new URL(req.url, "http://localhost");
 
+    const name = url.searchParams.get("name");
+    const a = Number(url.searchParams.get("a"));
+    const b = Number(url.searchParams.get("b"));
+    const c = Number(url.searchParams.get("c"));
+
+    const max = number.max(a,b,c);
+
+    
+
     res.writeHead(200, {
         "Content-Type": "text/plain; charset=utf-8"
     });
 
-    res.end("Hello Roshan");
+    res.end("Max Number :" +max);
 
 });
 
