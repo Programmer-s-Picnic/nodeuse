@@ -27,7 +27,7 @@ const server = http.createServer(async (req, res) => {
     const b = Number(url.searchParams.get("b"));
     const c = Number(url.searchParams.get("c"));
 
-    const max = number.max(a,b,c);
+    const max = Number.max(a,b,c);
 
     
 
