@@ -246,10 +246,46 @@ const server = http.createServer(async (req, res) => {
 
     }
 
-    // ====================================
-    // HOME PAGE
-    // ====================================
+        
+else if (path === "/insert-task") {
 
+    let pool;
+
+    try {
+
+        const taskName = url.searchParams.get("task_name");
+        const message = url.searchParams.get("message");
+
+        if (!taskName || !message) {
+            res.statusCode = 400;
+            res.end("Please provide task_name and message");
+            return;
+        }
+
+        pool = await new sql.ConnectionPool(mssqlConfig).connect();
+
+        await pool.request()
+            .input("task_name", sql.NVarChar, taskName)
+            .input("message", sql.NVarChar, message)
+            .query(`INSERT INTO Task (task_name, message)VALUES (@task_name, @message)`);
+        res.end("Data Inserted Successfully!");
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.statusCode = 500;
+        res.end("Insert Failed: " + error.message);
+
+    } finally {
+
+        if (pool) {
+            await pool.close();
+        }
+
+    }
+}
+   
     else {
 
         res.end(
