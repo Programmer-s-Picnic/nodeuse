@@ -69,7 +69,7 @@ const server = http.createServer(async (req, res) => {
             });
 
             const [rows] = await connection.query(
-                "SELECT 1 AS connected"
+                "SELECT 2 AS connected"
             );
 
             console.log("MySQL connected:", rows);
