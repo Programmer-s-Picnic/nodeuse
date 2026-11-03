@@ -251,7 +251,36 @@ else if (path==="/rohit")
 
     }
 
+else if (path === "/show-tables") {
 
+    let connection;
+
+    try {
+
+        connection = await mysql.createConnection({
+            host: process.env.DB_HOST,
+            port: Number(process.env.DB_PORT || 3306),
+            database: process.env.DB_NAME,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD
+        });
+
+        const [rows] = await connection.query("SHOW TABLES");
+
+        res.end(JSON.stringify(rows, null, 2));
+
+    } catch (error) {
+
+        res.statusCode = 500;
+        res.end(error.message);
+
+    } finally {
+
+        if (connection) await connection.end();
+
+    }
+
+}
 
     else {
 
