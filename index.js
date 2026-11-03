@@ -382,7 +382,53 @@ else if (path === "/update-task") {
 
 }
 
-    
+    else if (path === "/delete-task") {
+
+    let connection;
+
+    try {
+
+        const id= url.searchParams.get("id");
+        
+        if (!id) {
+            res.statusCode = 400;
+            res.end("Please provide id");
+            return;
+        }
+
+        connection = await mysql.createConnection({
+            host: process.env.DB_HOST,
+            port: Number(process.env.DB_PORT || 3306),
+            database: process.env.DB_NAME,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD
+        });
+
+        const query = `delete from task where id=?`;
+
+        const [result] = await connection.execute([id]);
+          if(result.affectedRows===0){
+              res.end("Tast Is Not Delete");
+          }else{
+              res.end("Task Is Delete Successfully");
+          }
+    } catch (error) {
+
+        console.log("Update Error:", error);
+        res.statusCode = 500;
+        res.end("Update Failed: " + error.message);
+
+    } finally {
+
+        if (connection)
+        {
+            await connection.end();
+        }
+
+    }
+
+}
+
 
     else {
 
