@@ -359,7 +359,7 @@ else if (path === "/update-task") {
 
         const query = `update task set task_name=?, message=? where id=?`;
 
-        const [result] = await connection.execute(query,[id, task_name, message]);
+        const [result] = await connection.execute(query,[task_name, message,id]);
           if(result.affectedRows===0){
               res.end("Task Not Found");
           }else{
