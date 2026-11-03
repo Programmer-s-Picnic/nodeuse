@@ -345,7 +345,7 @@ else if (path === "/update-task") {
 
         if (!id || !task_name || !message) {
             res.statusCode = 400;
-            res.end("Please provide id and task_name and massage");
+            res.end("Please provide id and task_name and message");
             return;
         }
 
@@ -357,7 +357,7 @@ else if (path === "/update-task") {
             password: process.env.DB_PASSWORD
         });
 
-        const query = `update task set task_name=?, massage=? where id=?`;
+        const query = `update task set task_name=?, message=? where id=?`;
 
         const [result] = await connection.execute(query,[id, task_name, message]);
           if(result.affectedRows===0){
