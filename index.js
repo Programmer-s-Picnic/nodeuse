@@ -290,6 +290,7 @@ else if (path === "/insert-task") {
 
     let connection;
 
+    
     try {
 
         const taskName = url.searchParams.get("task_name");
@@ -331,21 +332,16 @@ else if (path === "/insert-task") {
 
 }
 
-
-
-else if (path === "/update-task") {
+  else if (path === "/delete-task") {
 
     let connection;
 
     try {
+        const id = url.searchParams.get("id");
 
-        const id= url.searchParams.get("id");
-        const task_name = url.searchParams.get("task_name");
-        const message = url.searchParams.get("message");
-
-        if (!id || !task_name || !message) {
+        if (!id) {
             res.statusCode = 400;
-            res.end("Please provide id and task_name and message");
+            res.end("Please provide id");
             return;
         }
 
@@ -357,32 +353,31 @@ else if (path === "/update-task") {
             password: process.env.DB_PASSWORD
         });
 
-        const query = `update task set task_name=?, message=? where id=?`;
+        const query = `delete from task where id=?`;
 
-        const [result] = await connection.execute(query,[task_name, message,id]);
-          if(result.affectedRows===0){
-              res.end("Task Not Found");
-          }else{
-              res.end("Task Updated Successfully");
-          }
+        const [result] = await connection.execute(query, [id]);
+
+         if(result.affectedRows===0){
+            res.end("Task Not Found");
+         }else{
+          res.end("Task Delete Successfully");
+         }
+
     } catch (error) {
 
-        console.log("Update Error:", error);
+        console.log("delete error:", error);
         res.statusCode = 500;
-        res.end("Update Failed: " + error.message);
+        res.end("delete failed: " + error.message);
 
     } finally {
 
-        if (connection)
-        {
+        if (connection) {
             await connection.end();
         }
 
     }
 
-}
-
-    
+} 
 
     else {
 
