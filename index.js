@@ -340,7 +340,7 @@ else if (path === "/update-task") {
     try {
 
         const id= url.searchParams.get("id");
-        const taskName = url.searchParams.get("task_name");
+        const task_name = url.searchParams.get("task_name");
         const message = url.searchParams.get("message");
 
         if (!id || !taskName || !message) {
