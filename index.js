@@ -251,6 +251,50 @@ else if (path==="/rohit")
 
     }
 
+else if (path === "/create-table") {
+
+    let connection;
+
+    try {
+
+        connection = await mysql.createConnection({
+            host: process.env.DB_HOST,
+            port: Number(process.env.DB_PORT || 3306),
+            database: process.env.DB_NAME,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD
+        });
+
+        const query = `
+            CREATE TABLE IF NOT EXISTS task (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                task_name VARCHAR(255) NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `;
+
+        await connection.query(query);
+
+        res.end("Task Table Created Successfully!");
+
+    } catch (error) {
+
+        console.log("Table Creation Error:", error);
+
+        res.statusCode = 500;
+        res.end("Table Creation Failed: " + error.message);
+
+    } finally {
+
+        if (connection) {
+            await connection.end();
+        }
+
+    }
+
+}
+
     // ====================================
     // HOME PAGE
     // ====================================
