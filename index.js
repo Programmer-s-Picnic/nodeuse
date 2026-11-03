@@ -331,6 +331,59 @@ else if (path === "/insert-task") {
 
 }
 
+
+
+else if (path === "/update-task") {
+
+    let connection;
+
+    try {
+
+        const id= url.searchParams.get("id");
+        const taskName = url.searchParams.get("task_name");
+        const message = url.searchParams.get("message");
+
+        if (!id || !taskName || !message) {
+            res.statusCode = 400;
+            res.end("Please provide id and task_name and massage");
+            return;
+        }
+
+        connection = await mysql.createConnection({
+            host: process.env.DB_HOST,
+            port: Number(process.env.DB_PORT || 3306),
+            database: process.env.DB_NAME,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD
+        });
+
+        const query = `update task set task_name=?, massage=? where id=?`;
+
+        const [result] = await connection.execute(query,[id, task_name, message]);
+          if(result.affectedRows===0){
+              res.end("Task Not Found");
+          }else{
+              res.end("Task Updated Successfully");
+          }
+    } catch (error) {
+
+        console.log("Update Error:", error);
+        res.statusCode = 500;
+        res.end("Update Failed: " + error.message);
+
+    } finally {
+
+        if (connection)
+        {
+            await connection.end();
+        }
+
+    }
+
+}
+
+    
+
     else {
 
         res.end(
