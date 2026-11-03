@@ -71,15 +71,15 @@ const server = http.createServer(async (req, res) => {
             });
 
             const [rows] = await connection.query(
-                "SELECT 1 AS connected"
-            );
+    "SELECT DATABASE() AS database_name"
+);
 
-            console.log("MySQL connected:", rows);
+console.log("MySQL Database Name:", rows[0].database_name);
 
-            res.end(
-                "MySQL Connected Successfully!\n\n" +
-                JSON.stringify(rows, null, 2)
-            );
+res.end(
+    "MySQL Connected Successfully!\n\n" +
+    "Database Name: " + rows[0].database_name
+);
 
         } catch (err) {
 
