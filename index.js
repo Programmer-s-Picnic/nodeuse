@@ -53,6 +53,8 @@ const server = http.createServer(async (req, res) => {
     // MYSQL CONNECTION TEST
     // ====================================
 
+
+    
     if (path === "/mysql") {
 
         let connection;
