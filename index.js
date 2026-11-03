@@ -265,7 +265,7 @@ else if (path === "/show-tables") {
             password: process.env.DB_PASSWORD
         });
 
-        const [rows] = await connection.query("SHOW TABLES");
+        const [rows] = await connection.query("SELECT * FROM task");
 
         res.end(JSON.stringify(rows, null, 2));
 
