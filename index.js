@@ -282,6 +282,55 @@ else if (path === "/show-tables") {
 
 }
 
+    // ====================================
+// INSERT DATA INTO MYSQL TABLE
+// ====================================
+
+else if (path === "/insert-task") {
+
+    let connection;
+
+    try {
+
+        const taskName = url.searchParams.get("task_name");
+        const message = url.searchParams.get("message");
+
+        if (!taskName || !message) {
+            res.statusCode = 400;
+            res.end("Please provide task_name and message");
+            return;
+        }
+
+        connection = await mysql.createConnection({
+            host: process.env.DB_HOST,
+            port: Number(process.env.DB_PORT || 3306),
+            database: process.env.DB_NAME,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD
+        });
+
+        const query = `INSERT INTO task (task_name, message)VALUES (?, ?)`;
+
+        const [result] = await connection.execute(query,[taskName, message]);
+        res.end("Data Inserted Successfully!\n" + "Inserted ID: " + result.insertId);
+
+    } catch (error) {
+
+        console.log("Insert Error:", error);
+        res.statusCode = 500;
+        res.end("Insert Failed: " + error.message);
+
+    } finally {
+
+        if (connection)
+        {
+            await connection.end();
+        }
+
+    }
+
+}
+
     else {
 
         res.end(
