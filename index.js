@@ -343,7 +343,7 @@ else if (path === "/update-task") {
         const task_name = url.searchParams.get("task_name");
         const message = url.searchParams.get("message");
 
-        if (!id || !taskName || !message) {
+        if (!id || !task_name || !message) {
             res.statusCode = 400;
             res.end("Please provide id and task_name and massage");
             return;
