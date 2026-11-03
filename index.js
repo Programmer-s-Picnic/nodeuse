@@ -186,7 +186,7 @@ const server = http.createServer(async (req, res) => {
     // MICROSOFT SQL SERVER CONNECTION
     // ====================================
 else if (path==="/rohit")
-    [
+{
         res.end("rohit");
         }
     else if (path === "/mssql") {
