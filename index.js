@@ -406,7 +406,7 @@ else if (path === "/update-task") {
 
         const query = `delete from task where id=?`;
 
-        const [result] = await connection.execute([id]);
+        const [result] = await connection.execute(query,[id]);
           if(result.affectedRows===0){
               res.end("Tast Is Not Delete");
           }else{
