@@ -2,45 +2,11 @@
 "use strict";
 
 const http = require("node:http");
-const ejs = require("ejs");
 const mysql = require("mysql2/promise");
+const ejs = require("ejs");
 const path = require("node:path");
 
 const PORT = Number(process.env.PORT) || 3000;
-
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT || 3306),
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 5,
-    multipleStatements: false
-});
-
-const view = path.join(
-    __dirname,
-    "views",
-    "sql-console.ejs"
-);
-
-function authorized(req) {
-    const user = process.env.CONSOLE_USER;
-    const pass = process.env.CONSOLE_PASSWORD;
-
-    if (!user || !pass) return false;
-
-    const header = req.headers.authorization || "";
-
-    if (!header.startsWith("Basic ")) return false;
-
-    const value = Buffer.from(
-        header.slice(6), "base64"
-    ).toString("utf8");
-
-    return value === `${user}:${pass}`;
-}
 
 const server = http.createServer(async (req, res) => {
 
@@ -50,48 +16,34 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname === "/mysql-console") {
 
-        res.setHeader("Cache-Control", "no-store");
-
-        if (!authorized(req)) {
-            res.writeHead(401, {
-                "WWW-Authenticate": 'Basic realm="MySQL Console"'
-            });
-            res.end("Authentication required");
-            return;
-        }
-
-        if (req.method !== "GET" &&
-            req.method !== "POST") {
-            res.writeHead(405, { Allow: "GET, POST" });
-            res.end("Method Not Allowed");
-            return;
-        }
-
         let query = "SELECT * FROM task LIMIT 10";
         let fields = [];
         let rows = [];
         let message = "";
         let error = "";
 
+        if (req.method !== "GET" && req.method !== "POST") {
+            res.writeHead(405, { Allow: "GET, POST" });
+            res.end("Method Not Allowed");
+            return;
+        }
+
         if (req.method === "POST") {
+
+            let connection;
+
             try {
-                const chunks = [];
-                let size = 0;
+                let body = "";
 
                 for await (const chunk of req) {
-                    size += chunk.length;
+                    body += chunk.toString("utf8");
 
-                    if (size > 8192) {
+                    if (Buffer.byteLength(body, "utf8") > 8192) {
                         res.writeHead(413);
                         res.end("Query too large");
                         return;
                     }
-
-                    chunks.push(chunk);
                 }
-
-                const body = Buffer.concat(chunks)
-                    .toString("utf8");
 
                 query = new URLSearchParams(body)
                     .get("query") || "";
@@ -104,28 +56,38 @@ const server = http.createServer(async (req, res) => {
                     sql.includes(";")
                 ) {
                     throw new Error(
-                        "Only one read-only query is allowed"
+                        "Only one read-only SQL statement is allowed"
                     );
                 }
 
-                // A SELECT-only database account is
-                // required: this text check is not a
-                // database security boundary.
+                // Use existing GoDaddy MySQL configuration
+                connection = await mysql.createConnection({
+                    host: process.env.DB_HOST,
+                    port: Number(process.env.DB_PORT || 3306),
+                    database: process.env.DB_NAME,
+                    user: process.env.DB_USER,
+                    password: process.env.DB_PASSWORD,
+                    multipleStatements: false,
+                    connectTimeout: 10000
+                });
+
                 const [result, metadata] =
-                    await pool.query({
+                    await connection.query({
                         sql,
                         timeout: 10000
                     });
 
-                fields = metadata.map(
-                    field => field.name
-                );
+                if (!Array.isArray(result)) {
+                    throw new Error("Expected a result set");
+                }
+
+                fields = metadata.map(field => field.name);
 
                 rows = result.slice(0, 100).map(row =>
                     fields.map(field => {
                         const value = row[field];
 
-                        if (value === null) return "NULL";
+                        if (value == null) return "NULL";
                         if (Buffer.isBuffer(value))
                             return "[binary data]";
                         if (value instanceof Date)
@@ -138,26 +100,33 @@ const server = http.createServer(async (req, res) => {
                 );
 
                 message =
-                    `Query successful. Showing ${rows.length} row(s).`;
+                    `Query successful. ${result.length} row(s) returned.` +
+                    (result.length > 100 ? " Showing first 100." : "");
 
             } catch (err) {
                 console.error("MySQL Error:", err);
+                error = "Query failed: check SQL and database permissions.";
 
-                error = "Query failed. Check SQL syntax and permissions.";
+            } finally {
+                if (connection) {
+                    try {
+                        await connection.end();
+                    } catch (err) {
+                        console.error("MySQL close error:", err);
+                    }
+                }
             }
         }
 
         try {
-            const html = await ejs.renderFile(view, {
-                query,
-                fields,
-                rows,
-                message,
-                error
-            });
+            const html = await ejs.renderFile(
+                path.join(__dirname, "views", "sql-console.ejs"),
+                { query, fields, rows, message, error }
+            );
 
             res.writeHead(200, {
                 "Content-Type": "text/html; charset=utf-8",
+                "Cache-Control": "no-store",
                 "X-Content-Type-Options": "nosniff",
                 "Content-Security-Policy":
                     "default-src 'none'; style-src 'unsafe-inline'; " +
