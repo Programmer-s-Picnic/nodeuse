@@ -4,6 +4,9 @@ const http = require("node:http");
 const net = require("node:net");
 const mysql = require("mysql2/promise");
 const sql = require("mssql");
+const ejs = require("ejs");
+const crypto = require("node:crypto");
+const pathModule = require("node:path");
 
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -16,7 +19,7 @@ const mssqlConfig = {
     port: 1433,
     database: "testwhatsapp",
     user: "testwhatsapp",
-    password: "M%E4Zn3li3oxjkp_",
+    password: process.env.MSSQL_PASSWORD,
 
     options: {
         encrypt: true,
@@ -26,6 +29,100 @@ const mssqlConfig = {
     connectionTimeout: 30000,
     requestTimeout: 30000
 };
+
+
+// ====================================
+// AUTHENTICATED READ-ONLY EJS SQL CONSOLE
+// Configure SQL_CONSOLE_USER, SQL_CONSOLE_PASSWORD and a SELECT-only MySQL account.
+// ====================================
+const SQL_CONSOLE_VIEW = pathModule.join(__dirname, "views", "sql-console.ejs");
+const MAX_SQL_BODY_BYTES = 12 * 1024;
+
+function constantTimeEqual(a, b) {
+    const x = crypto.createHash("sha256").update(String(a)).digest();
+    const y = crypto.createHash("sha256").update(String(b)).digest();
+    return crypto.timingSafeEqual(x, y);
+}
+
+function consoleAuthorized(req) {
+    const user = process.env.SQL_CONSOLE_USER;
+    const pass = process.env.SQL_CONSOLE_PASSWORD;
+    if (!user || !pass || !req.headers.authorization?.startsWith("Basic ")) return false;
+    try {
+        const decoded = Buffer.from(req.headers.authorization.slice(6), "base64").toString("utf8");
+        const i = decoded.indexOf(":");
+        return i >= 0 && constantTimeEqual(decoded.slice(0, i), user) && constantTimeEqual(decoded.slice(i + 1), pass);
+    } catch { return false; }
+}
+
+async function handleSqlConsole(req, res) {
+    // Ignore permissive CORS settings of the legacy demonstration server.
+    res.removeHeader("Access-Control-Allow-Origin");
+    res.removeHeader("Access-Control-Allow-Methods");
+    res.removeHeader("Access-Control-Allow-Headers");
+    res.setHeader("Cache-Control", "no-store");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'");
+    if (!consoleAuthorized(req)) {
+        res.writeHead(401, { "WWW-Authenticate": 'Basic realm="MySQL Query Console", charset="UTF-8"', "Content-Type": "text/plain; charset=utf-8" });
+        res.end("Authentication required. Configure SQL_CONSOLE_USER and SQL_CONSOLE_PASSWORD.");
+        return;
+    }
+    if (req.method !== "GET" && req.method !== "POST") {
+        res.writeHead(405, { Allow: "GET, POST" }); res.end("Method not allowed"); return;
+    }
+
+    let query = "SELECT * FROM task LIMIT 10";
+    let fields = [], rows = [], message = "", error = "";
+    if (req.method === "POST") {
+        try {
+            let body = "";
+            for await (const chunk of req) {
+                body += chunk.toString("utf8");
+                if (Buffer.byteLength(body, "utf8") > MAX_SQL_BODY_BYTES) {
+                    res.writeHead(413); res.end("Query too large"); return;
+                }
+            }
+            query = new URLSearchParams(body).get("query") || "";
+            const q = query.trim().replace(/;\s*$/, "");
+            // This gate is for usability, NOT a security boundary. The DB account must be read-only.
+            if (!/^(SELECT|SHOW|DESCRIBE|DESC|EXPLAIN)\b/i.test(q) || q.includes(";")) {
+                error = "Only one read-only SELECT, SHOW, DESCRIBE or EXPLAIN statement is allowed.";
+            } else if (q.length > 4000) {
+                error = "Query length must not exceed 4,000 characters.";
+            } else {
+                const connection = await mysql.createConnection({
+                    host: process.env.SQL_CONSOLE_DB_HOST || process.env.DB_HOST,
+                    port: Number(process.env.SQL_CONSOLE_DB_PORT || process.env.DB_PORT || 3306),
+                    database: process.env.SQL_CONSOLE_DB_NAME || process.env.DB_NAME,
+                    user: process.env.SQL_CONSOLE_DB_USER,
+                    password: process.env.SQL_CONSOLE_DB_PASSWORD,
+                    multipleStatements: false,
+                    connectTimeout: 10000
+                });
+                try {
+                    const [result, metadata] = await connection.query({ sql: q, timeout: 10000 });
+                    if (!Array.isArray(result)) throw new Error("Expected a read-only result set");
+                    fields = metadata.map(f => f.name);
+                    rows = result.slice(0, 100).map(r => fields.map(k => {
+                        const v = r[k];
+                        if (v === null || v === undefined) return "NULL";
+                        if (Buffer.isBuffer(v)) return "[binary data]";
+                        if (v instanceof Date) return v.toISOString();
+                        return typeof v === "object" ? JSON.stringify(v) : String(v);
+                    }));
+                    message = `${result.length} row(s) returned` + (result.length > 100 ? "; showing first 100" : "");
+                } finally { await connection.end().catch(e => console.error("Console close error:", e)); }
+            }
+        } catch (e) {
+            console.error("SQL console error:", e);
+            error = "Could not execute the query. Check the server logs and database permissions.";
+        }
+    }
+    const html = await ejs.renderFile(SQL_CONSOLE_VIEW, { query, fields, rows, message, error });
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(html);
+}
 
 // ====================================
 // CREATE HTTP SERVER
@@ -48,6 +145,12 @@ const server = http.createServer(async (req, res) => {
 
     const url = new URL(req.url, "http://localhost");
     const path = url.pathname;
+
+    if (path === "/sql-console") {
+        try { await handleSqlConsole(req, res); }
+        catch (err) { console.error("EJS rendering error:", err); if (!res.headersSent) res.writeHead(500); res.end("Internal server error"); }
+        return;
+    }
 
     // ====================================
     // MYSQL CONNECTION TEST
