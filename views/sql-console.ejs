@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MySQL Query Console</title>
+<style>
+:root { font-family: system-ui, sans-serif; color:#15324c; background:#edf5fc; }
+body { margin:0; } main { max-width:1050px; margin:35px auto; padding:0 16px; }
+section { background:white; border-radius:16px; border:1px solid #c7dff3; padding:24px; box-shadow:0 6px 20px #274e7410; }
+h1 { margin:0; color:#145b9d; } p { color:#526c82; } label { font-weight:700; display:block; margin-bottom:9px; }
+textarea { box-sizing:border-box; width:100%; min-height:145px; padding:14px; border:1px solid #9bbbd5; border-radius:10px; font:15px/1.5 ui-monospace,Consolas,monospace; }
+button { margin-top:14px; background:#176cba; border:0; border-radius:9px; padding:12px 19px; color:white; font-weight:700; cursor:pointer; }
+.note { background:#eaf3fc; padding:12px; border-radius:8px; margin:16px 0; } .error { background:#fff0f0; color:#991e2f; padding:12px; border-radius:8px; margin:15px 0; }
+.result { overflow-x:auto; margin-top:14px; } table { border-collapse:collapse; min-width:100%; font-size:14px; } th,td { border:1px solid #d6e5f1; padding:9px 13px; text-align:left; vertical-align:top; white-space:pre-wrap; overflow-wrap:anywhere; } th { background:#e6f2fc; } tr:nth-child(even) { background:#f8fbff; }
+small { color:#627b90; }
+</style></head><body><main><section>
+<h1>MySQL Query Console</h1>
+<p>Run one read-only query against the teaching database.</p>
+<div class="note">Allowed: SELECT, SHOW, DESCRIBE and EXPLAIN. Only the first 100 result rows appear in the table.</div>
+<form method="post" action="/sql-console">
+<label for="query">SQL query</label>
+<textarea id="query" name="query" maxlength="4000" spellcheck="false" required><%= query %></textarea>
+<button type="submit">▶ Execute Query</button>
+</form>
+<% if (error) { %><div class="error" role="alert"><%= error %></div><% } %>
+<% if (message) { %><div class="note"><strong><%= message %></strong></div><% } %>
+<% if (fields.length) { %><div class="result"><table><thead><tr><% fields.forEach(function(col){ %><th><%= col %></th><% }); %></tr></thead>
+<tbody><% rows.forEach(function(row){ %><tr><% row.forEach(function(value){ %><td><%= value %></td><% }); %></tr><% }); %></tbody></table></div>
+<% } %>
+<p><small>For authorized teaching use only. Queries run with a separately configured read-only MySQL account.</small></p>
+</section></main></body></html>
