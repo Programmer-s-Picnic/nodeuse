@@ -1,109 +1,434 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>MySQL Console</title>
+    <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, initial-scale=1">
+          content="width=device-width, initial-scale=1.0">
+
+    <title>MySQL Query Console</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            margin: 0;
             background: #f0f7ff;
-            padding: 25px;
+            font-family: Arial, sans-serif;
+            color: #24364b;
+        }
+
+        header {
+            background: #1565c0;
+            color: white;
+            padding: 18px 25px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        header p {
+            margin: 6px 0 0;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: #e3f2fd;
+            padding: 12px 25px;
+            border-bottom: 1px solid #bbdefb;
+        }
+
+        nav a {
+            color: #1565c0;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 25px auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 22px;
+            margin-bottom: 22px;
+            border: 1px solid #dce9f6;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #1565c0;
+            font-size: 20px;
         }
 
         textarea {
             width: 100%;
-            height: 130px;
-            box-sizing: border-box;
-            padding: 12px;
-            font-family: monospace;
+            min-height: 180px;
+            resize: vertical;
+            padding: 15px;
+            border: 1px solid #90caf9;
+            border-radius: 6px;
+            font-family: Consolas, monospace;
+            font-size: 15px;
+            line-height: 1.6;
+            background: #f9fcff;
+            color: #1a237e;
+        }
+
+        textarea:focus {
+            outline: 2px solid #64b5f6;
+        }
+
+        .toolbar {
+            margin-top: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
         }
 
         button {
-            margin-top: 10px;
-            padding: 10px 20px;
             background: #1976d2;
-            color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
+            padding: 11px 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
             cursor: pointer;
         }
 
-        .results {
+        button:hover {
+            background: #0d47a1;
+        }
+
+        .secondary {
+            background: #607d8b;
+        }
+
+        .secondary:hover {
+            background: #455a64;
+        }
+
+        .danger {
+            background: #d32f2f;
+        }
+
+        .danger:hover {
+            background: #b71c1c;
+        }
+
+        .hint {
+            color: #607d8b;
+            font-size: 13px;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #1b5e20;
+            padding: 15px;
+            border-left: 4px solid #43a047;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #b71c1c;
+            padding: 15px;
+            border-left: 4px solid #e53935;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .table-container {
             overflow-x: auto;
-            margin-top: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid #dce9f6;
+            border-radius: 6px;
         }
 
         table {
-            border-collapse: collapse;
             width: 100%;
+            border-collapse: collapse;
             background: white;
-        }
-
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: left;
+            font-size: 14px;
         }
 
         th {
             background: #1976d2;
             color: white;
+            padding: 12px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
         }
 
-        .error { color: red; }
-        .success { color: green; }
+        td {
+            border-bottom: 1px solid #e3edf7;
+            padding: 10px 12px;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+            max-width: 450px;
+        }
+
+        tr:nth-child(even) {
+            background: #f5faff;
+        }
+
+        tr:hover {
+            background: #e3f2fd;
+        }
+
+        .empty {
+            text-align: center;
+            color: #78909c;
+            padding: 25px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #78909c;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 20px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-    <h1>MySQL Query Console</h1>
+    <header>
+        <h1>MySQL Query Console</h1>
+        <p>Node.js + EJS + MySQL</p>
+    </header>
 
-    <form method="POST" action="/mysql-console">
-        <textarea name="query"
-                  placeholder="Enter SQL query"><%= query %></textarea>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/mysql-admin">MySQL Admin</a>
+        <a href="/mysql-console">SQL Console</a>
+    </nav>
 
-        <br>
+    <main class="container">
 
-        <button type="submit">Execute SQL</button>
-    </form>
+        <!-- SQL EDITOR -->
 
-    <% if (error) { %>
-        <p class="error"><%= error %></p>
-    <% } %>
+        <section class="card">
 
-    <% if (message) { %>
-        <p class="success"><%= message %></p>
-    <% } %>
+            <h2>SQL Editor</h2>
 
-    <% if (fields.length > 0) { %>
+            <form
+                method="POST"
+                action="/mysql-console"
+                id="sqlForm">
 
-        <div class="results">
-            <table>
-                <thead>
-                    <tr>
-                        <% fields.forEach(field => { %>
-                            <th><%= field %></th>
-                        <% }) %>
-                    </tr>
-                </thead>
+                <textarea
+                    name="query"
+                    id="sqlQuery"
+                    spellcheck="false"
+                    placeholder="Enter your MySQL query here..."
+                ><%= query %></textarea>
 
-                <tbody>
-                    <% rows.forEach(row => { %>
-                        <tr>
-                            <% row.forEach(value => { %>
-                                <td><%= value %></td>
-                            <% }) %>
-                        </tr>
-                    <% }) %>
-                </tbody>
-            </table>
-        </div>
+                <div class="toolbar">
 
-    <% } %>
+                    <button type="submit">
+                        ▶ Execute SQL
+                    </button>
+
+                    <button
+                        type="button"
+                        class="secondary"
+                        onclick="clearEditor()">
+                        Clear
+                    </button>
+
+                    <button
+                        type="button"
+                        class="secondary"
+                        onclick="insertExample()">
+                        Example Query
+                    </button>
+
+                    <span class="hint">
+                        Ctrl + Enter to execute
+                    </span>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- QUERY STATUS -->
+
+        <% if (message) { %>
+
+            <section class="card">
+
+                <h2>Execution Status</h2>
+
+                <div class="success"><%= message %></div>
+
+            </section>
+
+        <% } %>
+
+        <% if (error) { %>
+
+            <section class="card">
+
+                <h2>SQL Error</h2>
+
+                <div class="error"><%= error %></div>
+
+            </section>
+
+        <% } %>
+
+        <!-- QUERY RESULTS -->
+
+        <% if (fields && fields.length > 0) { %>
+
+            <section class="card">
+
+                <h2>Query Results</h2>
+
+                <p class="hint">
+                    Displaying <%= rows.length %> row(s)
+                </p>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <% fields.forEach(function(field) { %>
+                                    <th><%= field %></th>
+                                <% }); %>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <% if (rows.length === 0) { %>
+
+                                <tr>
+                                    <td
+                                        colspan="<%= fields.length %>"
+                                        class="empty">
+                                        Query returned no records.
+                                    </td>
+                                </tr>
+
+                            <% } else { %>
+
+                                <% rows.forEach(function(row) { %>
+
+                                    <tr>
+
+                                        <% row.forEach(function(value) { %>
+
+                                            <td><%= value %></td>
+
+                                        <% }); %>
+
+                                    </tr>
+
+                                <% }); %>
+
+                            <% } %>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        <% } %>
+
+    </main>
+
+    <footer class="footer">
+        MySQL Console | Learn With Champak
+    </footer>
+
+    <script>
+
+        function clearEditor() {
+            document.getElementById("sqlQuery").value = "";
+            document.getElementById("sqlQuery").focus();
+        }
+
+        function insertExample() {
+            document.getElementById("sqlQuery").value =
+                "SELECT * FROM task LIMIT 10;";
+        }
+
+        document.getElementById("sqlQuery")
+            .addEventListener("keydown", function(event) {
+
+                if (event.ctrlKey &&
+                    event.key === "Enter") {
+
+                    event.preventDefault();
+
+                    document.getElementById("sqlForm")
+                        .requestSubmit();
+                }
+
+            });
+
+        document.getElementById("sqlForm")
+            .addEventListener("submit", function(event) {
+
+                const query = document
+                    .getElementById("sqlQuery")
+                    .value.trim();
+
+                if (!query) {
+                    event.preventDefault();
+                    alert("Please enter an SQL query.");
+                }
+
+            });
+
+    </script>
 
 </body>
 </html>
