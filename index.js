@@ -11,7 +11,11 @@ const server = http.createServer((req, res) => {
         "Content-Type": "text/html; charset=utf-8"
     });
 
-    res.end("<h1>Hello World!</h1>");
+    if (req.url === "/mysql-admin") {
+        res.end("<h1>MySQL Admin</h1>");
+    } else {
+        res.end("<h1>Hello World!</h1>");
+    }
 
 });
 
