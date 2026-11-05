@@ -1,11 +1,9 @@
 
-"use strict";
-
 const express = require("express");
 
 const app = express();
 app.set("view engine, "ejs");
-const(express.urlencoded({ express: true )};
+app.use(express.urlencoded({ extended: true }));
 
 const PORT = Number(process.env.PORT) || 3000;
 
