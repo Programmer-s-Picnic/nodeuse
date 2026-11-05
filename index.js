@@ -4,9 +4,7 @@ const app = express();
 const port = 3000;
 
 app.get("/", (req, res) => {
-    let name = ["Dhoni", "Virat", "Hardik"];
-    
-    res.render("hello.ejs", {username: name} );
+      res.render("hello.ejs");
 });
 
 app.listen(port, (req,res) => {
