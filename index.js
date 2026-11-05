@@ -184,13 +184,13 @@ const server = http.createServer(async (req, res) => {
 //***********Hello*****************
 if (pathname === "/hello") {
 let myname="MS Dhoni":
-    const html = await ejs.renderFile(
+    const hellohtml = await ejs.renderFile(
                 helloView,
                 {
                    myname
                 }
             );
-    res.end(html);
+    res.end(hellohtml);
         
 }
 
