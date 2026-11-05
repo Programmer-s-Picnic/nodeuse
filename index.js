@@ -2,17 +2,14 @@
 const express = require("express");
 
 const app = express();
-app.set("view engine, "ejs");
-app.use(express.urlencoded({ extended: true }));
-
-const PORT = Number(process.env.PORT) || 3000;
+const port = 3000;
 
 app.get("/", (req, res) => {
     let name = ["Dhoni", "Virat", "Hardik"];
     
-    res.render("hello", { username: name });
+    res.render("hello.ejs", {uername: name});
 });
 
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, (req,res) => {
     console.log("Server running on port " + PORT);
 });
