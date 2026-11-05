@@ -4,7 +4,7 @@
 const express = require("express");
 
 const app = express();
-const("view engine, "ejs");
+app.set("view engine, "ejs");
 const(express.urlencoded({ express: true )};
 
 const PORT = Number(process.env.PORT) || 3000;
