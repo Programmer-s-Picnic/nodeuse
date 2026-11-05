@@ -179,7 +179,7 @@ const server = http.createServer(async (req, res) => {
 
 //***********Hello*****************
 if (pathname === "/hello") { 
-let myname="MS Dhoni";
+const myname="MS Dhoni";
    
     res.end("jjk");
         
