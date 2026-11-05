@@ -9,7 +9,7 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.get("/", (req, res) => {
     // res.send("<h1>Hello World Express</h1>");
-      let name = ["Dhoni", "Virat", "MongoDosa"];
+      let name = ["Dhoni", "Virat", "Hardik"];
     res.render("hello.ejs",{username: name});
     
 });
