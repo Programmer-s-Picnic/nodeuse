@@ -177,6 +177,15 @@ const server = http.createServer(async (req, res) => {
         "http://localhost"
     ).pathname;
 
+//***********Hello*****************
+if (pathname === "/hello") {
+
+    res.end("Hello");
+        
+}
+
+    //**********Hello*****************
+    
     // ====================================
     // MYSQL CONSOLE
     // ====================================
