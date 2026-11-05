@@ -10,6 +10,6 @@ app.get("/", (req, res) => {
     res.render("hello.ejs", {uername: name});
 });
 
-app.listen(PORT, (req,res) => {
-    console.log("Server running on port " + PORT);
+app.listen(port, (req,res) => {
+    console.log(`Server running at http://localhost${port}`);
 });
