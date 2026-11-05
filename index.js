@@ -181,7 +181,40 @@ const server = http.createServer(async (req, res) => {
 if (pathname === "/hello") { 
  
    
-    res.end("jjk");
+
+
+
+
+
+// *********** HELLO *****************
+if (pathname === "/hello") {
+
+    try {
+        const html = await ejs.renderFile(
+            path.join(__dirname, "views", "hello.ejs")
+        );
+
+        res.writeHead(200, {
+            "Content-Type": "text/html; charset=utf-8"
+        });
+
+        res.end(html);
+
+    } catch (err) {
+        console.error("EJS Error:", err);
+        res.writeHead(500);
+        res.end("Error loading hello.ejs");
+    }
+
+    return;
+}
+// *********** HELLO *****************
+
+
+
+
+
+    
         
 }
 
