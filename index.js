@@ -31,11 +31,11 @@ const sqlConsoleView = path.join(
     "views",
     "sql-console.ejs"
 );
-const helloView = path.join(
-    __dirname,
-    "views",
-    "hello.ejs"
-);
+// const helloView = path.join(
+//     __dirname,
+//     "views",
+//     "hello.ejs"
+// );
 // ========================================
 // FORMAT MYSQL VALUES
 // ========================================
