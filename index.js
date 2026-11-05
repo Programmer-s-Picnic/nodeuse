@@ -31,7 +31,11 @@ const sqlConsoleView = path.join(
     "views",
     "sql-console.ejs"
 );
-
+const helloView = path.join(
+    __dirname,
+    "views",
+    "hello.ejs"
+);
 // ========================================
 // FORMAT MYSQL VALUES
 // ========================================
@@ -179,8 +183,14 @@ const server = http.createServer(async (req, res) => {
 
 //***********Hello*****************
 if (pathname === "/hello") {
-
-    res.end("Hello");
+let myname="MS Dhoni":
+    const html = await ejs.renderFile(
+                helloView,
+                {
+                   myname
+                }
+            );
+    res.end(html);
         
 }
 
