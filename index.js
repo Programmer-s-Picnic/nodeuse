@@ -21,6 +21,20 @@ async function dbConnect() {
     return mysql.createConnection(dbConfig);
 }
 
+// Initialize the three-column classroom registration table once at startup.
+// The promise is awaited by registration/login so requests cannot race creation.
+const registerTableReady = dbPool.query(`
+    CREATE TABLE IF NOT EXISTS \`register\` (
+        username VARCHAR(40) NOT NULL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        password VARCHAR(100) NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+`);
+registerTableReady.then(
+    () => console.log("MySQL register table ready"),
+    error => console.error("Unable to initialize register table:", error.code || error.message)
+);
+
 app.disable("x-powered-by");
 app.set("view engine", "ejs");
 app.set("trust proxy", 1);
@@ -134,6 +148,7 @@ app.post("/register", csrfCheck, async (req, res) => {
         });
     }
     try {
+        await registerTableReady;
         await dbPool.execute(
             "INSERT INTO `register` (username, name, password) VALUES (?, ?, ?)",
             [username, name, password]
@@ -162,6 +177,7 @@ app.post("/login", csrfCheck, async (req, res) => {
         csrf: sessionFor(req, res).csrf, error: "Enter username and password.", registered: false
     });
     try {
+        await registerTableReady;
         const [rows] = await dbPool.execute(
             "SELECT username, name FROM `register` WHERE username = ? AND password = ? LIMIT 1",
             [username, password]
