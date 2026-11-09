@@ -127,6 +127,12 @@ app.post("/register", csrfCheck, async (req, res) => {
             error: "Username: 3–40 letters, digits or underscores. Name: 1–100 characters. Password: 6–100 characters."
         });
     }
+    if (typeof req.body.confirmPassword !== "string" || password !== req.body.confirmPassword) {
+        return res.status(400).render("register", {
+            csrf: sessionFor(req, res).csrf,
+            error: "Password and Confirm Password do not match."
+        });
+    }
     try {
         await dbPool.execute(
             "INSERT INTO taskusers (username, name, password) VALUES (?, ?, ?)",
