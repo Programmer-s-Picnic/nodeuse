@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Login | NodeUse</title><style>
+body{margin:0;background:#edf7ff;font:16px system-ui,Arial;color:#16395d;display:grid;min-height:100vh;place-items:center}
+main{width:min(420px,92vw);background:white;padding:30px;border-radius:18px;box-shadow:0 10px 35px #1c5d9330}
+h1{margin-top:0}label{display:block;margin-top:14px;font-weight:600}input{box-sizing:border-box;width:100%;padding:12px;border:1px solid #9bbcd4;border-radius:9px;margin-top:6px}
+button{margin-top:20px;background:#1263a0;border:0;color:white;padding:13px;border-radius:9px;width:100%;cursor:pointer}
+.error{color:#ad1d2b}.ok{color:#176c46}small{color:#5a6471}a{color:#1263a0}</style></head>
+<body><main><h1>Student login</h1><p>NodeUse — MySQL and EJS classroom project</p>
+<p><small>Use only a unique practice password, never a personal password.</small></p>
+<% if (registered) { %><p class="ok">Registration successful. Please log in.</p><% } %>
+<% if (error) { %><p class="error" role="alert"><%= error %></p><% } %>
+<form method="post" action="/login">
+<input type="hidden" name="csrf" value="<%= csrf %>">
+<label>Username<input name="username" autocomplete="username" required></label>
+<label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+<button type="submit">Login</button></form>
+<p>New user? <a href="/register">Register</a></p></main></body></html>
