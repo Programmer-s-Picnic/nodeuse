@@ -101,8 +101,12 @@ function dbError(res, err) {
     return res.status(500).send("Database unavailable. Please try later.");
 }
 
-// Existing EJS home page is preserved, including the username array.
+// Main navigation homepage; the original EJS cricket example remains at /hello.
 app.get("/", (req, res) => {
+    const session = sessionFor(req, res);
+    res.render("home", { user: session.username ? { username: session.username, name: session.name } : null });
+});
+app.get("/hello", (req, res) => {
     // res.send("<h1>Hello World Express</h1>");
       let name = ["Dhoni", "Virat", "Hardik"];
     res.render("hello.ejs",{username: name});
@@ -213,6 +217,59 @@ app.post("/logout", csrfCheck, (req, res) => {
     sessions.delete(session.id);
     res.clearCookie("task_session", { path: "/" });
     return res.redirect("/login");
+});
+
+// The SQL console is for classroom practice only.
+// A login is required, since arbitrary SQL can modify or delete database data.
+function sqlPage(req, res, data = {}) {
+    const session = sessionFor(req, res);
+    res.render("sql-console", {
+        query: "", rows: [], fields: [], message: null, error: null,
+        csrf: session.csrf, ...data
+    });
+}
+app.get("/mysql-console", requireLogin, (req, res) => sqlPage(req, res));
+app.post("/mysql-console", requireLogin, csrfCheck, async (req, res) => {
+    const query = typeof req.body.query === "string" ? req.body.query.trim() : "";
+    if (!query || query.length > 10000) {
+        return res.status(400).render("sql-console", {
+            query, rows: [], fields: [], message: null,
+            error: "Enter one SQL statement (maximum 10,000 characters).",
+            csrf: sessionFor(req, res).csrf
+        });
+    }
+    try {
+        // mysql2's default multipleStatements=false limits each execution to one statement.
+        const [result, columns] = await dbPool.query(query);
+        if (Array.isArray(result)) {
+            // Works with SELECT, SHOW, DESCRIBE and other result-producing statements.
+            const fieldNames = columns.map(column => column.name);
+            const rows = result.slice(0, 200).map(row =>
+                fieldNames.map(field => {
+                    const value = row[field];
+                    if (value === null || value === undefined) return "NULL";
+                    if (Buffer.isBuffer(value)) return "[binary data]";
+                    return typeof value === "object" ? JSON.stringify(value) : String(value);
+                })
+            );
+            return sqlPage(req, res, {
+                query, fields: fieldNames, rows,
+                message: result.length > 200
+                    ? "Query completed. Displaying the first 200 of " + result.length + " rows."
+                    : "Query completed. " + result.length + " row(s) returned."
+            });
+        }
+        return sqlPage(req, res, {
+            query, message: "SQL executed. Affected rows: " + (result.affectedRows ?? 0) +
+                ". Changed rows: " + (result.changedRows ?? 0) + "."
+        });
+    } catch (error) {
+        console.error("SQL console error:", error.code || error.message);
+        return sqlPage(req, res, { query, error: error.message });
+    }
+});
+app.get("/mysql-admin", requireLogin, (req, res) => {
+    res.redirect("/mysql-console");
 });
 
 app.listen(PORT, "0.0.0.0", () => {
