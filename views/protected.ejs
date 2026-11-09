@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Protected | NodeUse</title><style>body{background:#edf7ff;color:#16395d;font:16px system-ui;display:grid;place-items:center;min-height:100vh}
+main{background:white;border-radius:16px;padding:30px;max-width:550px;box-shadow:0 10px 30px #12345620}
+a{color:#1263a0}code{background:#eaf3fc;padding:3px 6px;border-radius:5px}</style></head>
+<body><main><h1>Protected student page</h1><p>Login successful. This page is accessible only after authentication.</p>
+<p>Username: <strong><%= user.username %></strong></p>
+<p>Name: <strong><%= user.name %></strong></p>
+<p>Your session is remembered through a private browser cookie. Logout removes your server session.</p>
+<p><a href="/logout">Logout</a> · <a href="/">Home</a></p></main></body></html>
