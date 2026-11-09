@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Logout | NodeUse</title><style>body{background:#edf7ff;color:#16395d;font:16px system-ui;display:grid;place-items:center;min-height:100vh}
+main{background:white;border-radius:16px;padding:30px;max-width:420px;box-shadow:0 10px 30px #12345620}
+button{background:#1263a0;color:white;border:0;border-radius:9px;padding:12px 20px;cursor:pointer}a{color:#1263a0}</style></head>
+<body><main><h1>Logout</h1><% if (username) { %><p>Signed in as <strong><%= username %></strong>.</p>
+<form method="post" action="/logout"><input type="hidden" name="csrf" value="<%= csrf %>">
+<button type="submit">Confirm logout</button></form><% } else { %><p>You are not signed in.</p><% } %>
+<p><a href="/login">Login</a> · <a href="/protected">Protected page</a></p></main></body></html>
