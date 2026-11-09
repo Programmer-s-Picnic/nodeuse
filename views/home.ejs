@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NodeUse — Node.js, Express, EJS and MySQL demos</title>
+<meta name="description" content="Learn Node.js with Express, EJS, MySQL, student registration and SQL exercises.">
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#153b60;background:#ecf6ff}
+*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(115deg,#105a9e,#237fc2);color:white;padding:34px 20px}
+.wrap{max-width:1060px;margin:auto}h1{font-size:clamp(1.8rem,4vw,2.7rem);margin:0 0 9px}header p{margin:0;line-height:1.6}
+main{padding:28px 20px 40px}h2{margin:18px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.card{display:block;text-decoration:none;color:inherit;background:white;border:1px solid #cfe4f5;border-radius:15px;padding:20px;box-shadow:0 4px 18px #16496b14;transition:transform .15s,box-shadow .15s}
+.card:hover,.card:focus-visible{transform:translateY(-3px);box-shadow:0 9px 24px #16496b28;outline:2px solid #65a6df}
+.card strong{display:block;color:#145b9a;font-size:1.15rem}.card span{display:block;margin-top:8px;color:#51677b;line-height:1.55}
+.note{border:1px solid #c4dbec;background:white;border-radius:12px;padding:16px;margin:24px 0}
+.nav{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}.nav a{color:white;border:1px solid #ffffff80;border-radius:9px;padding:8px 12px;text-decoration:none}
+footer{text-align:center;padding:20px;font-size:13px;color:#587189}
+</style></head>
+<body>
+<header><div class="wrap">
+<h1>NodeUse — Learn Node.js by doing</h1>
+<p>Express.js · EJS templates · MySQL · Registration, login, sessions and SQL practice</p>
+<div class="nav"><a href="/hello">Hello EJS</a><a href="/register">Register</a><a href="/login">Login</a><a href="/protected">Protected</a><a href="/logout">Logout</a><a href="/mysql-console">SQL Console</a></div>
+</div></header>
+<main class="wrap">
+<% if (user) { %>
+<div class="note">Signed in as <strong><%= user.name %></strong> (<%= user.username %>). <a href="/logout">Logout</a>.</div>
+<% } else { %>
+<div class="note">Welcome! Register or log in to try the protected page and SQL console.</div>
+<% } %>
+<h2>All NodeUse application URLs</h2>
+<div class="grid">
+<a class="card" href="/hello"><strong>/hello — EJS demo</strong><span>The original cricketers array displayed by hello.ejs, unchanged.</span></a>
+<a class="card" href="/register"><strong>/register — Register</strong><span>Insert a student into the three-field MySQL register table.</span></a>
+<a class="card" href="/login"><strong>/login — Login</strong><span>Look up a student in MySQL and start a browser session.</span></a>
+<a class="card" href="/protected"><strong>/protected — Protected page</strong><span>Displays the signed-in student. Redirects guests to login.</span></a>
+<a class="card" href="/logout"><strong>/logout — Logout</strong><span>Confirm logout and end the current server session.</span></a>
+<a class="card" href="/mysql-console"><strong>/mysql-console — SQL Console</strong><span>Execute one SQL statement at a time and see returned rows or affected counts. Login required.</span></a>
+<a class="card" href="/mysql-admin"><strong>/mysql-admin — Admin shortcut</strong><span>Redirects to the SQL console for classroom exercises.</span></a>
+<a class="card" href="/mysql-check"><strong>/mysql-check — Connection test</strong><span>Checks connectivity to MySQL by executing SELECT 1.</span></a>
+<a class="card" href="https://nodeuse.learnwithchampak.live/learn/"><strong>Node.js lesson — 0 to Infinity</strong><span>Open the 20-step learning course on GitHub Pages.</span></a>
+<a class="card" href="https://github.com/Programmer-s-Picnic/nodeuse"><strong>GitHub source code</strong><span>Inspect index.js, the EJS views and the SQL setup.</span></a>
+</div>
+<div class="note"><strong>Teaching environment:</strong> SQL console commands can change database records. This sample authentication project stores practice passwords as plain text; never use personal passwords or a production database.</div>
+</main>
+<footer>Programmer's Picnic · Learn With Champak · NodeUse</footer>
+</body></html>
