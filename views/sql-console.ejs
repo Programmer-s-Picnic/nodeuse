@@ -239,6 +239,10 @@
     <nav>
         <a href="/">Home</a>
         <a href="/mysql-admin">MySQL Admin</a>
+        <a href="/register">Register</a>
+        <a href="/login">Login</a>
+        <a href="/logout">Logout</a>
+        <a href="/protected">Protected</a>
         <a href="/mysql-console">SQL Console</a>
     </nav>
 
@@ -249,11 +253,14 @@
         <section class="card">
 
             <h2>SQL Editor</h2>
+            <p class="hint">Classroom demo: supports one SQL statement at a time, including SELECT, INSERT, UPDATE, DELETE and CREATE TABLE. SQL runs using the configured database account. Do not use against important data.</p>
 
             <form
                 method="POST"
                 action="/mysql-console"
                 id="sqlForm">
+
+                <input type="hidden" name="csrf" value="<%= csrf %>">
 
                 <textarea
                     name="query"
@@ -397,7 +404,7 @@
 
         function insertExample() {
             document.getElementById("sqlQuery").value =
-                "SELECT * FROM task LIMIT 10;";
+                "SELECT username, name FROM `register` LIMIT 10;";
         }
 
         document.getElementById("sqlQuery")
