@@ -30,7 +30,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// Educational example: sessions are stored in server memory, not in taskusers.
+// Educational example: sessions are stored in server memory, not in the register table.
 // Restarting the server logs users out. Do not use this session store for a
 // real, multi-instance production application.
 const sessions = new Map();
@@ -111,7 +111,7 @@ app.get("/mysql-check", async (req, res) => {
     }
 });
 
-// SQL table: taskusers(username, name, password).
+// SQL table: register(username, name, password).
 // WARNING: This explicitly stores passwords in clear text for a classroom
 // demonstration only. Never reuse a real password or deploy as real auth.
 app.get("/register", (req, res) => {
@@ -135,7 +135,7 @@ app.post("/register", csrfCheck, async (req, res) => {
     }
     try {
         await dbPool.execute(
-            "INSERT INTO taskusers (username, name, password) VALUES (?, ?, ?)",
+            "INSERT INTO `register` (username, name, password) VALUES (?, ?, ?)",
             [username, name, password]
         );
         return res.redirect("/login?registered=1");
@@ -163,7 +163,7 @@ app.post("/login", csrfCheck, async (req, res) => {
     });
     try {
         const [rows] = await dbPool.execute(
-            "SELECT username, name FROM taskusers WHERE username = ? AND password = ? LIMIT 1",
+            "SELECT username, name FROM `register` WHERE username = ? AND password = ? LIMIT 1",
             [username, password]
         );
         if (!rows.length) {
