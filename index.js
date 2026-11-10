@@ -3,6 +3,8 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
 const crypto = require("node:crypto");
+const path = require("node:path");
+const { installTasks } = require("./task-manager");
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -39,6 +41,7 @@ app.disable("x-powered-by");
 app.set("view engine", "ejs");
 app.set("trust proxy", 1);
 app.use(express.urlencoded({ extended: false, limit: "8kb" }));
+app.use("/task-assets", express.static(path.join(__dirname, "public")));
 app.use((req, res, next) => {
     res.setHeader("Cache-Control", "no-store");
     next();
@@ -268,6 +271,8 @@ app.post("/mysql-console", requireLogin, csrfCheck, async (req, res) => {
 app.get("/mysql-admin", requireLogin, (req, res) => {
     res.redirect("/mysql-console");
 });
+
+installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck, sessionFor });
 
 app.listen(PORT, "0.0.0.0", () => {
     console.log("Server running on port " + PORT);
