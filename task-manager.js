@@ -8,7 +8,7 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
   // Use schema compatible with shared GoDaddy MySQL installations without
   // modifying or deleting any existing user data.
   const statements = [
-    ["tasks", `CREATE TABLE IF NOT EXISTS tasks (
+    ["nodeuse_tasks", `CREATE TABLE IF NOT EXISTS nodeuse_tasks (
       taskid BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
       username VARCHAR(40) NOT NULL,
       title VARCHAR(200) NOT NULL,
@@ -21,7 +21,7 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
       INDEX idx_task_owner (username),
       INDEX idx_task_status (status)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`],
-    ["task_shares", `CREATE TABLE IF NOT EXISTS task_shares (
+    ["nodeuse_task_shares", `CREATE TABLE IF NOT EXISTS nodeuse_task_shares (
       taskid BIGINT UNSIGNED NOT NULL,
       sharedwith VARCHAR(40) NOT NULL,
       permission ENUM('Viewer','Editor') NOT NULL DEFAULT 'Viewer',
@@ -29,7 +29,7 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
       PRIMARY KEY (taskid,sharedwith),
       INDEX idx_shared_user (sharedwith)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`],
-    ["task_comments", `CREATE TABLE IF NOT EXISTS task_comments (
+    ["nodeuse_task_comments", `CREATE TABLE IF NOT EXISTS nodeuse_task_comments (
       commentid BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
       taskid BIGINT UNSIGNED NOT NULL,
       username VARCHAR(40) NOT NULL,
@@ -71,7 +71,7 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
   let lastRuntimeError = null;
   app.get("/tasks/diagnostics", requireLogin, async (req, res) => {
     const result = { setup: databaseState, lastRuntimeError, tables: {} };
-    for (const name of ["tasks", "task_shares", "task_comments"]) {
+    for (const name of ["nodeuse_tasks", "nodeuse_task_shares", "nodeuse_task_comments"]) {
       try {
         const [columns] = await dbPool.query("SHOW COLUMNS FROM \`" + name + "\`");
         result.tables[name] = { columns: columns.map(col => col.Field) };
@@ -90,7 +90,7 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
   const errorPage = (res, message, status = 400) => res.status(status).render("task-error", {message});
   const ready = async (req,res,next) => { try { await schemaReady; next(); } catch(e) { console.error(e); errorPage(res,"Task database setup failed (" + (databaseState.code || "UNKNOWN") + "). Check /tasks/db-status after login and GoDaddy runtime logs.",503); } };
   const access = async (taskid, username) => {
-    const [rows] = await dbPool.execute("SELECT t.*, s.permission FROM tasks t LEFT JOIN task_shares s ON s.taskid=t.taskid AND s.sharedwith=? WHERE t.taskid=? AND (t.username=? OR s.sharedwith=?) LIMIT 1", [username,taskid,username,username]);
+    const [rows] = await dbPool.execute("SELECT t.*, s.permission FROM nodeuse_tasks t LEFT JOIN nodeuse_task_shares s ON s.taskid=t.taskid AND s.sharedwith=? WHERE t.taskid=? AND (t.username=? OR s.sharedwith=?) LIMIT 1", [username,taskid,username,username]);
     return rows[0] || null;
   };
   const wrap = fn => (req,res,next) => Promise.resolve(fn(req,res)).catch(next);
@@ -113,7 +113,7 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
   app.get("/tasks/shared", requireLogin, (req,res) => res.redirect("/tasks?view=shared"));
   app.get("/tasks", requireLogin, ready, wrap(async (req,res) => {
     const username=req.user.username;
-    const [rows] = await dbPool.execute("SELECT t.*, s.permission, (SELECT COUNT(*) FROM task_comments c WHERE c.taskid=t.taskid) AS comment_count, (SELECT COUNT(*) FROM task_shares q WHERE q.taskid=t.taskid) AS share_count FROM tasks t LEFT JOIN task_shares s ON s.taskid=t.taskid AND s.sharedwith=? WHERE t.username=? OR s.sharedwith=? ORDER BY t.updatedat DESC, t.taskid DESC",[username,username,username]);
+    const [rows] = await dbPool.execute("SELECT t.*, s.permission, (SELECT COUNT(*) FROM nodeuse_task_comments c WHERE c.taskid=t.taskid) AS comment_count, (SELECT COUNT(*) FROM nodeuse_task_shares q WHERE q.taskid=t.taskid) AS share_count FROM nodeuse_tasks t LEFT JOIN nodeuse_task_shares s ON s.taskid=t.taskid AND s.sharedwith=? WHERE t.username=? OR s.sharedwith=? ORDER BY t.updatedat DESC, t.taskid DESC",[username,username,username]);
     const view=["mine","shared","all"].includes(req.query.view) ? req.query.view : "all";
     const status=statuses.includes(req.query.status) ? req.query.status : "";
     const priority=priorities.includes(req.query.priority) ? req.query.priority : "";
@@ -129,7 +129,7 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
   app.post("/tasks/new", requireLogin, csrfCheck, ready, wrap(async (req,res) => {
     const v=taskValues(req);
     if (!v) return res.status(400).render("task-form",{task:req.body,csrf:csrf(req,res),error:"Enter a title (up to 200 characters), valid priority/status, and optional date."});
-    const [result] = await dbPool.execute("INSERT INTO tasks (username,title,description,priority,status,duedate) VALUES (?,?,?,?,?,?)",[req.user.username,v.title,v.description,v.priority,v.status,v.duedate]);
+    const [result] = await dbPool.execute("INSERT INTO nodeuse_tasks (username,title,description,priority,status,duedate) VALUES (?,?,?,?,?,?)",[req.user.username,v.title,v.description,v.priority,v.status,v.duedate]);
     res.redirect("/tasks/"+result.insertId);
   }));
   // Static paths must be registered before dynamic /tasks/:id.
@@ -145,7 +145,7 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
     const task=await access(id,req.user.username);if(!task)return errorPage(res,"Task not found.",404);
     if(!canEdit(task,req.user.username))return errorPage(res,"View-only access.",403);
     const v=taskValues(req);if(!v)return res.status(400).render("task-form",{task:{...task,...req.body},csrf:csrf(req,res),error:"Please correct the task details."});
-    await dbPool.execute("UPDATE tasks SET title=?,description=?,priority=?,status=?,duedate=? WHERE taskid=?",[v.title,v.description,v.priority,v.status,v.duedate,id]);
+    await dbPool.execute("UPDATE nodeuse_tasks SET title=?,description=?,priority=?,status=?,duedate=? WHERE taskid=?",[v.title,v.description,v.priority,v.status,v.duedate,id]);
     res.redirect("/tasks/"+id);
   }));
   app.post("/tasks/:id/delete",requireLogin,csrfCheck,ready,wrap(async(req,res)=>{
@@ -157,9 +157,9 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
     const connection = await dbPool.getConnection();
     try {
       await connection.beginTransaction();
-      await connection.execute("DELETE FROM task_comments WHERE taskid=?", [id]);
-      await connection.execute("DELETE FROM task_shares WHERE taskid=?", [id]);
-      await connection.execute("DELETE FROM tasks WHERE taskid=? AND username=?", [id,req.user.username]);
+      await connection.execute("DELETE FROM nodeuse_task_comments WHERE taskid=?", [id]);
+      await connection.execute("DELETE FROM nodeuse_task_shares WHERE taskid=?", [id]);
+      await connection.execute("DELETE FROM nodeuse_tasks WHERE taskid=? AND username=?", [id,req.user.username]);
       await connection.commit();
     } catch (error) {
       await connection.rollback();
@@ -173,22 +173,22 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
     const id=idOf(req.params.id), status=text(req.body.status);if(!id||!statuses.includes(status))return errorPage(res,"Invalid task or status.");
     const task=await access(id,req.user.username);if(!task)return errorPage(res,"Task not found.",404);
     if(!canEdit(task,req.user.username))return errorPage(res,"View-only access.",403);
-    await dbPool.execute("UPDATE tasks SET status=? WHERE taskid=?",[status,id]);res.redirect("/tasks/"+id);
+    await dbPool.execute("UPDATE nodeuse_tasks SET status=? WHERE taskid=?",[status,id]);res.redirect("/tasks/"+id);
   }));
   app.post("/tasks/:id/comments",requireLogin,csrfCheck,ready,wrap(async(req,res)=>{
     const id=idOf(req.params.id), comment=text(req.body.commenttext);
     if(!id||!comment||comment.length>2000)return errorPage(res,"Comment must contain 1–2000 characters.");
     const task=await access(id,req.user.username);if(!task)return errorPage(res,"Task not found.",404);
-    await dbPool.execute("INSERT INTO task_comments(taskid,username,commenttext) VALUES(?,?,?)",[id,req.user.username,comment]);
+    await dbPool.execute("INSERT INTO nodeuse_task_comments(taskid,username,commenttext) VALUES(?,?,?)",[id,req.user.username,comment]);
     res.redirect("/tasks/"+id+"#comments");
   }));
   app.post("/tasks/:id/comments/:commentId/delete",requireLogin,csrfCheck,ready,wrap(async(req,res)=>{
     const id=idOf(req.params.id),commentid=idOf(req.params.commentId);if(!id||!commentid)return errorPage(res,"Invalid ID.");
     const task=await access(id,req.user.username);if(!task)return errorPage(res,"Task not found.",404);
-    const [r]=await dbPool.execute("SELECT username FROM task_comments WHERE taskid=? AND commentid=?",[id,commentid]);
+    const [r]=await dbPool.execute("SELECT username FROM nodeuse_task_comments WHERE taskid=? AND commentid=?",[id,commentid]);
     if(!r.length)return errorPage(res,"Comment not found.",404);
     if(r[0].username!==req.user.username && !isOwner(task,req.user.username))return errorPage(res,"Only the author or task owner can delete this comment.",403);
-    await dbPool.execute("DELETE FROM task_comments WHERE taskid=? AND commentid=?",[id,commentid]);res.redirect("/tasks/"+id+"#comments");
+    await dbPool.execute("DELETE FROM nodeuse_task_comments WHERE taskid=? AND commentid=?",[id,commentid]);res.redirect("/tasks/"+id+"#comments");
   }));
   app.post("/tasks/:id/share",requireLogin,csrfCheck,ready,wrap(async(req,res)=>{
     const id=idOf(req.params.id),sharedwith=text(req.body.sharedwith),permission=text(req.body.permission);
@@ -198,20 +198,20 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
     if(sharedwith===req.user.username)return errorPage(res,"You already own this task.");
     const [users]=await dbPool.execute("SELECT username FROM `register` WHERE username=? LIMIT 1",[sharedwith]);
     if(!users.length)return errorPage(res,"This username is not registered.",404);
-    await dbPool.execute("INSERT INTO task_shares(taskid,sharedwith,permission) VALUES(?,?,?) ON DUPLICATE KEY UPDATE permission=VALUES(permission)",[id,sharedwith,permission]);
+    await dbPool.execute("INSERT INTO nodeuse_task_shares(taskid,sharedwith,permission) VALUES(?,?,?) ON DUPLICATE KEY UPDATE permission=VALUES(permission)",[id,sharedwith,permission]);
     res.redirect("/tasks/"+id+"#sharing");
   }));
   app.post("/tasks/:id/unshare",requireLogin,csrfCheck,ready,wrap(async(req,res)=>{
     const id=idOf(req.params.id),sharedwith=text(req.body.sharedwith);if(!id||!sharedwith)return errorPage(res,"Invalid request.");
     const task=await access(id,req.user.username);if(!task)return errorPage(res,"Task not found.",404);
     if(!isOwner(task,req.user.username))return errorPage(res,"Only the owner can revoke sharing.",403);
-    await dbPool.execute("DELETE FROM task_shares WHERE taskid=? AND sharedwith=?",[id,sharedwith]);res.redirect("/tasks/"+id+"#sharing");
+    await dbPool.execute("DELETE FROM nodeuse_task_shares WHERE taskid=? AND sharedwith=?",[id,sharedwith]);res.redirect("/tasks/"+id+"#sharing");
   }));
   app.get("/tasks/:id",requireLogin,ready,wrap(async(req,res)=>{
     const id=idOf(req.params.id);if(!id)return errorPage(res,"Invalid task ID.");
     const task=await access(id,req.user.username);if(!task)return errorPage(res,"Task not found or not shared with you.",404);
-    const [comments]=await dbPool.execute("SELECT c.commentid,c.username,c.commenttext,c.createdat,r.name FROM task_comments c JOIN `register` r ON r.username=c.username WHERE c.taskid=? ORDER BY c.createdat,c.commentid",[id]);
-    const [shares]=await dbPool.execute("SELECT s.sharedwith,s.permission,s.sharedat,r.name FROM task_shares s JOIN `register` r ON r.username=s.sharedwith WHERE s.taskid=? ORDER BY s.sharedat",[id]);
+    const [comments]=await dbPool.execute("SELECT c.commentid,c.username,c.commenttext,c.createdat,r.name FROM nodeuse_task_comments c JOIN `register` r ON r.username=c.username WHERE c.taskid=? ORDER BY c.createdat,c.commentid",[id]);
+    const [shares]=await dbPool.execute("SELECT s.sharedwith,s.permission,s.sharedat,r.name FROM nodeuse_task_shares s JOIN `register` r ON r.username=s.sharedwith WHERE s.taskid=? ORDER BY s.sharedat",[id]);
     res.render("task-detail",{task,comments,shares,user:req.user,owner:isOwner(task,req.user.username),editor:canEdit(task,req.user.username),csrf:csrf(req,res)});
   }));
   // Forward asynchronous failures to a local error view, without leaking SQL.
