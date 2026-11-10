@@ -94,7 +94,7 @@ flowchart TD
 - Editor: view, edit, change status, comment and remove own comments.
 - Viewer: view, comment and remove own comments.
 - A user without access gets a 404 for private tasks.
-- Deleting a task cascades to comments and sharing rows.
+- Deleting a task must explicitly delete its comments and sharing rows in the same transaction, because physical foreign keys are not required by the compatibility schema.
 - A registered username is required for sharing.
 - Use POST + CSRF for task mutations, and parameterized SQL for data values.
 
@@ -115,3 +115,10 @@ flowchart TD
 ## Deployment
 
 GoDaddy Airo is connected to the `main` branch of the NodeUse repository. Select Update Preview and Publish to Live. The MySQL account needs CREATE TABLE and foreign-key permissions. Verify with two registered demo accounts, then test cross-user access. The teaching registration system stores plaintext passwords; do not use real passwords.
+
+
+## GoDaddy MySQL compatibility update (10 November 2026)
+
+The initial `CREATE TABLE` commands declared foreign keys referencing the existing `register` table. On GoDaddy MySQL, an existing parent table may use a different collation or storage engine, causing task schema initialization to fail (often `ER_CANNOT_ADD_FOREIGN` or MySQL errno 150). The updated setup creates the three task tables without database-enforced foreign keys and does not alter the `register` table. **The ER diagram shows logical relationships, not physical foreign-key constraints.** Task ownership, sharing access, recipient existence and deletion of related records must therefore be enforced by the application.
+
+A signed-in user can inspect `/tasks/db-status` for the database setup status and MySQL error code. On deployment, restart/publish the app to re-run schema initialization. Tables are created with `CREATE TABLE IF NOT EXISTS`, so existing tables and records remain untouched.
