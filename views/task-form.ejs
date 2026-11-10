@@ -1,5 +1,5 @@
-<%- include("task-head",{title:task?"Edit Task":"New Task"}) %>
-<section class="hero"><div><p class="eyebrow"><a href="/tasks">TASKS</a> / <%= task?"EDIT":"NEW" %></p><h1><%= task?"Edit task":"Create a task" %></h1><p>Set a title, description, due date, priority and status.</p></div></section>
+<%- include("task-head",{title:task&&task.taskid?"Edit Task":"New Task"}) %>
+<section class="hero"><div><p class="eyebrow"><a href="/tasks">TASKS</a> / <%= task&&task.taskid?"EDIT":"NEW" %></p><h1><%= task&&task.taskid?"Edit task":"Create a task" %></h1><p>Set a title, description, due date, priority and status.</p></div></section>
 <div class="panel narrow">
 <% if(error){ %><div class="alert" role="alert"><%= error %></div><% } %>
 <form method="post" action="<%= task&&task.taskid?'/tasks/'+task.taskid+'/edit':'/tasks/new' %>" class="taskform">
@@ -11,6 +11,6 @@
 <label>Status<select name="status"><% ["Pending","In Progress","Completed"].forEach(s=>{ %><option value="<%= s %>" <%= (task&&task.status||'Pending')===s?'selected':'' %>><%= s %></option><% }) %></select></label>
 </div>
 <label>Due date and time (optional) <input type="datetime-local" name="duedate" value="<%= task&&task.duedate ? (typeof task.duedate==='string'?task.duedate.replace(' ','T').slice(0,16):new Date(task.duedate).toISOString().slice(0,16)):'' %>"></label>
-<div class="actions"><button class="btn primary" type="submit"><%= task?"Save changes":"Create task" %></button><a class="btn" href="<%= task&&task.taskid?'/tasks/'+task.taskid:'/tasks' %>">Cancel</a></div>
+<div class="actions"><button class="btn primary" type="submit"><%= task&&task.taskid?"Save changes":"Create task" %></button><a class="btn" href="<%= task&&task.taskid?'/tasks/'+task.taskid:'/tasks' %>">Cancel</a></div>
 </form></div>
 <%- include("task-foot") %>
