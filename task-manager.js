@@ -139,7 +139,22 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
     const id=idOf(req.params.id);if(!id)return errorPage(res,"Invalid task ID.");
     const task=await access(id,req.user.username);if(!task)return errorPage(res,"Task not found.",404);
     if(!isOwner(task,req.user.username))return errorPage(res,"Only the owner can delete a task.",403);
-    await dbPool.execute("DELETE FROM tasks WHERE taskid=? AND username=?",[id,req.user.username]);res.redirect("/tasks");
+    // No database foreign key is required by the GoDaddy-compatible schema:
+    // explicitly remove dependent rows and task atomically.
+    const connection = await dbPool.getConnection();
+    try {
+      await connection.beginTransaction();
+      await connection.execute("DELETE FROM task_comments WHERE taskid=?", [id]);
+      await connection.execute("DELETE FROM task_shares WHERE taskid=?", [id]);
+      await connection.execute("DELETE FROM tasks WHERE taskid=? AND username=?", [id,req.user.username]);
+      await connection.commit();
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+    res.redirect("/tasks");
   }));
   app.post("/tasks/:id/status",requireLogin,csrfCheck,ready,wrap(async(req,res)=>{
     const id=idOf(req.params.id), status=text(req.body.status);if(!id||!statuses.includes(status))return errorPage(res,"Invalid task or status.");
