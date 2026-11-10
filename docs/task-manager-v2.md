@@ -1,3 +1,8 @@
+
+
+### MySQL table collision fix (10 November 2026)
+
+The GoDaddy runtime log showed `ER_BAD_FIELD_ERROR: Unknown column 't.taskid' in 'where clause'`. An existing generic `tasks` table did not have the expected NodeUse schema. To avoid modifying any pre-existing tables or data, the Task Manager now uses three dedicated physical tables: `nodeuse_tasks`, `nodeuse_task_shares`, and `nodeuse_task_comments`. Routes remain `/tasks` and students still use the existing `register` table. The ER diagram entities labeled TASKS/TASK_SHARES/TASK_COMMENTS map to these namespaced tables. Existing rows in old generic tables are intentionally untouched and not automatically migrated.
 # NodeUse Task Manager V2 — System Design
 
 Backend: Express.js + EJS + mysql2/promise. Host: https://snode.learnwithchampak.live/tasks
