@@ -1,13 +1,73 @@
 "use strict";
 // Collaborative Task Manager: MySQL persistence, ownership, sharing, comments.
 function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck, sessionFor }) {
+  // MySQL installations may have an existing register table with a different
+  // collation or storage engine. A foreign key to that table can fail with
+  // ER_CANNOT_ADD_FOREIGN / errno 150 even though ordinary queries work.
+  // The application already validates registration and task ownership itself.
+  // Use schema compatible with shared GoDaddy MySQL installations without
+  // modifying or deleting any existing user data.
+  const statements = [
+    ["tasks", `CREATE TABLE IF NOT EXISTS tasks (
+      taskid BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      username VARCHAR(40) NOT NULL,
+      title VARCHAR(200) NOT NULL,
+      description TEXT NULL,
+      priority ENUM('Low','Medium','High') NOT NULL DEFAULT 'Medium',
+      status ENUM('Pending','In Progress','Completed') NOT NULL DEFAULT 'Pending',
+      duedate DATETIME NULL,
+      createdat TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updatedat TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      INDEX idx_task_owner (username),
+      INDEX idx_task_status (status)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`],
+    ["task_shares", `CREATE TABLE IF NOT EXISTS task_shares (
+      taskid BIGINT UNSIGNED NOT NULL,
+      sharedwith VARCHAR(40) NOT NULL,
+      permission ENUM('Viewer','Editor') NOT NULL DEFAULT 'Viewer',
+      sharedat TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (taskid,sharedwith),
+      INDEX idx_shared_user (sharedwith)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`],
+    ["task_comments", `CREATE TABLE IF NOT EXISTS task_comments (
+      commentid BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      taskid BIGINT UNSIGNED NOT NULL,
+      username VARCHAR(40) NOT NULL,
+      commenttext TEXT NOT NULL,
+      createdat TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      INDEX idx_comment_task (taskid)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`]
+  ];
+  let databaseState = { ok: false, table: "register", code: null, message: null };
   const schemaReady = (async () => {
-    await registerTableReady;
-    await dbPool.query("CREATE TABLE IF NOT EXISTS tasks (taskid BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, username VARCHAR(40) NOT NULL, title VARCHAR(200) NOT NULL, description TEXT NULL, priority ENUM('Low','Medium','High') NOT NULL DEFAULT 'Medium', status ENUM('Pending','In Progress','Completed') NOT NULL DEFAULT 'Pending', duedate DATETIME NULL, createdat TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updatedat TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, INDEX idx_task_owner(username), INDEX idx_task_status(status), CONSTRAINT fk_task_owner FOREIGN KEY (username) REFERENCES `register`(username) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-    await dbPool.query("CREATE TABLE IF NOT EXISTS task_shares (taskid BIGINT UNSIGNED NOT NULL, sharedwith VARCHAR(40) NOT NULL, permission ENUM('Viewer','Editor') NOT NULL DEFAULT 'Viewer', sharedat TIMESTAMP DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(taskid,sharedwith), INDEX idx_shared_user(sharedwith), CONSTRAINT fk_share_task FOREIGN KEY(taskid) REFERENCES tasks(taskid) ON DELETE CASCADE, CONSTRAINT fk_share_user FOREIGN KEY(sharedwith) REFERENCES `register`(username) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-    await dbPool.query("CREATE TABLE IF NOT EXISTS task_comments (commentid BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, taskid BIGINT UNSIGNED NOT NULL, username VARCHAR(40) NOT NULL, commenttext TEXT NOT NULL, createdat TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX idx_comment_task(taskid), CONSTRAINT fk_comment_task FOREIGN KEY(taskid) REFERENCES tasks(taskid) ON DELETE CASCADE, CONSTRAINT fk_comment_user FOREIGN KEY(username) REFERENCES `register`(username) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    try {
+      await registerTableReady;
+      for (const [name, sql] of statements) {
+        databaseState.table = name;
+        await dbPool.query(sql);
+      }
+      databaseState = { ok: true, table: null, code: null, message: null };
+    } catch (error) {
+      databaseState = {
+        ok: false, table: databaseState.table,
+        code: error.code || "UNKNOWN",
+        message: error.sqlMessage || error.message || "Unknown MySQL error"
+      };
+      console.error("Task schema setup:", databaseState);
+      throw error;
+    }
   })();
-  schemaReady.then(() => console.log("Task Manager tables ready"), e => console.error("Task schema error:", e.message));
+  schemaReady.then(() => console.log("Task Manager tables ready"), () => {});
+  // Diagnostics are visible only to an authenticated student, and never expose
+  // database hostnames or credentials. /tasks/db-status is registered before /:id.
+  app.get("/tasks/db-status", requireLogin, (req, res) => {
+    res.json({
+      status: databaseState.ok ? "ready" : "error",
+      table: databaseState.table,
+      mysqlCode: databaseState.code,
+      message: databaseState.message
+    });
+  });
   const statuses = ["Pending","In Progress","Completed"];
   const priorities = ["Low","Medium","High"];
   const idOf = raw => /^[1-9][0-9]*$/.test(String(raw)) && Number.isSafeInteger(Number(raw)) ? Number(raw) : null;
@@ -15,7 +75,7 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
   const canEdit = (task, username) => task.username === username || task.permission === "Editor";
   const isOwner = (task, username) => task.username === username;
   const errorPage = (res, message, status = 400) => res.status(status).render("task-error", {message});
-  const ready = async (req,res,next) => { try { await schemaReady; next(); } catch(e) { console.error(e); errorPage(res,"Task database setup failed. Check DB permissions and application logs.",503); } };
+  const ready = async (req,res,next) => { try { await schemaReady; next(); } catch(e) { console.error(e); errorPage(res,"Task database setup failed (" + (databaseState.code || "UNKNOWN") + "). Check /tasks/db-status after login and GoDaddy runtime logs.",503); } };
   const access = async (taskid, username) => {
     const [rows] = await dbPool.execute("SELECT t.*, s.permission FROM tasks t LEFT JOIN task_shares s ON s.taskid=t.taskid AND s.sharedwith=? WHERE t.taskid=? AND (t.username=? OR s.sharedwith=?) LIMIT 1", [username,taskid,username,username]);
     return rows[0] || null;
