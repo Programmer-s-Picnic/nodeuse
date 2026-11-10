@@ -68,6 +68,19 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
       message: databaseState.message
     });
   });
+  let lastRuntimeError = null;
+  app.get("/tasks/diagnostics", requireLogin, async (req, res) => {
+    const result = { setup: databaseState, lastRuntimeError, tables: {} };
+    for (const name of ["tasks", "task_shares", "task_comments"]) {
+      try {
+        const [columns] = await dbPool.query("SHOW COLUMNS FROM \`" + name + "\`");
+        result.tables[name] = { columns: columns.map(col => col.Field) };
+      } catch (error) {
+        result.tables[name] = { code: error.code || "UNKNOWN" };
+      }
+    }
+    res.json(result);
+  });
   const statuses = ["Pending","In Progress","Completed"];
   const priorities = ["Low","Medium","High"];
   const idOf = raw => /^[1-9][0-9]*$/.test(String(raw)) && Number.isSafeInteger(Number(raw)) ? Number(raw) : null;
@@ -202,6 +215,17 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
     res.render("task-detail",{task,comments,shares,user:req.user,owner:isOwner(task,req.user.username),editor:canEdit(task,req.user.username),csrf:csrf(req,res)});
   }));
   // Forward asynchronous failures to a local error view, without leaking SQL.
-  app.use((err,req,res,next)=>{if(!req.path.startsWith("/tasks"))return next(err); console.error("Task Manager error:",err.message); if(res.headersSent)return next(err);errorPage(res,"Unable to process this task request. Check database connectivity.",500);});
+  app.use((err,req,res,next)=>{
+    if(!req.path.startsWith("/tasks"))return next(err);
+    lastRuntimeError = {
+      route: req.method+" "+req.path,
+      code: err.code || err.name || "UNKNOWN",
+      sqlState: err.sqlState || null,
+      message: String(err.sqlMessage || err.message || "Unknown error").slice(0,400)
+    };
+    console.error("Task Manager error:", lastRuntimeError);
+    if(res.headersSent)return next(err);
+    errorPage(res,"Unable to process this task request ("+lastRuntimeError.code+"). Open /tasks/diagnostics after login to inspect the error.",500);
+  });
 }
 module.exports={installTasks};
