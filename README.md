@@ -1,3 +1,17 @@
+# Current application — Collaborative Task Manager V2 (10 November 2026)
+
+The **GoDaddy Express/EJS/MySQL application** is at https://snode.learnwithchampak.live/. The task dashboard is at https://snode.learnwithchampak.live/tasks. The source code for tasks is `task-manager.js`; templates are `views/task-*.ejs`; styles are `public/tasks.css`.
+
+Features: task CRUD, status, priority, due date, dashboard statistics, search, filters, sorting, shared viewer/editor permissions, commenting, owner revocation, and server-side ownership/access checks. Tables `tasks`, `task_shares`, `task_comments` are auto-created after `register` initialization. See [ER and DFD diagrams](docs/task-manager-v2.md).
+
+Routes: `/tasks`, `/tasks/new`, `/tasks/shared`, `/tasks/:id`, `/tasks/:id/edit`, `/tasks/:id/status`, `/tasks/:id/delete`, `/tasks/:id/share`, `/tasks/:id/unshare`, and the task comment routes. Existing routes `/`, `/hello`, `/register`, `/login`, `/logout`, `/protected`, `/mysql-console`, `/mysql-admin`, and `/mysql-check` remain.
+
+**Deployment:** After commits to `main`, select GoDaddy Airo **Update Preview → Publish to Live**. GitHub commits do not prove GoDaddy has published the changes. The MySQL user needs CREATE TABLE/FOREIGN KEY permissions. Use two practice accounts to verify cross-user permissions. The existing registration demo uses plain-text passwords; never reuse real credentials or run the SQL console against important data.
+
+---
+
+## Historical earlier course setup
+
 **Current stage:** The live server at https://snode.learnwithchampak.live/ accepts `?name=Sunny` and returns `Hello Sunny`; without a name it returns `Hello Champak`. Lesson 2 embeds the full `index.js` and detailed explanations. The backend still does not have arithmetic or JSON API routes.\n\n# NodeUse — Node.js on GoDaddy, from 0 to Infinity
 
 **One repository for the whole project.**
