@@ -449,6 +449,26 @@ console.log(tasks);</code></pre></div>
 <details id="quiz20"><summary>Knowledge check: Why must a public task API check authorization?</summary><p>To ensure each user can only view or change tasks they are permitted to access.</p><button class="button small" type="button" data-share="#quiz20">Share this question</button></details>
 <div class="course-footer"><div class="buttons" style="margin-top:0"><a class="button" href="#ch19">← Previous</a><a class="button primary" href="#try-connection">Connection lab →</a></div><div class="buttons" style="margin-top:0"><a href="https://editor.learnwithchampak.live/" target="_blank" rel="noopener" class="button small">Our code editor</a><button type="button" class="button small" data-share="#ch20">Share chapter</button><a class="button small" target="_blank" rel="noopener" href="https://wa.me/?text=Infinity%3A%20REST%20API%20and%20Database%20%E2%80%94%20http%3A%2F%2Fnodeuse.learnwithchampak.live%2Flearn%2F%23ch20">WhatsApp</a><button type="button" class="button small" data-mark-complete>Mark chapter complete</button></div></div>
 </section>
+<section class="card" id="taskmanager-v2">
+<span class="tag">Complete project · Express + EJS + MySQL</span>
+<h2>Collaborative Task Manager — Working Full-Stack Project</h2>
+<p>We now have a MySQL-backed multi-user Task Manager. The server uses <code>task-manager.js</code> for Express routes, the existing <code>register</code> table for users, and three related tables for tasks, shares and comments. Unlike the original browser-only task exercises, these tasks are stored in MySQL.</p>
+<div class="buttons"><a class="button primary" href="https://snode.learnwithchampak.live/tasks" target="_blank" rel="noopener">Open Task Manager</a><a class="button" href="https://snode.learnwithchampak.live/tasks/new" target="_blank" rel="noopener">Create a Task</a><a class="button" href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/task-manager.js" target="_blank" rel="noopener">Read Express Source</a><a class="button" href="https://github.com/Programmer-s-Picnic/nodeuse/blob/main/docs/task-manager-v2.md" target="_blank" rel="noopener">ER and DFD Diagrams</a></div>
+<h3>Study the database relationships</h3>
+<p>The <code>register</code> table has one row per student. Each student owns many <code>tasks</code>. Each task can have many <code>task_comments</code> and many <code>task_shares</code>. Each share links a task to a registered user and contains Viewer or Editor permission. Foreign keys enforce these relationships.</p>
+<h3>Follow a complete task request</h3>
+<ol>
+<li>Log in: Express checks the existing <code>register</code> table and creates a session.</li>
+<li>Open <code>/tasks/new</code>: Express renders an EJS form containing an anti-CSRF token.</li>
+<li>Submit the form: Express validates the values and executes a parameterized <code>INSERT INTO tasks</code>.</li>
+<li>View <code>/tasks</code>: the database returns owned and shared tasks. EJS displays the dashboard.</li>
+<li>Share with a username: the owner inserts or updates a row in <code>task_shares</code>. Viewers can read and comment; editors can also update.</li>
+<li>Add a comment: Express checks access and inserts a row into <code>task_comments</code>.</li>
+<li>Delete a task: only its owner can delete; foreign-key cascades clean up shares and comments.</li>
+</ol>
+<p><strong>Practice:</strong> Create two disposable student accounts. Log in as the first user and create a task. Share it with the second user as Viewer; confirm the second student can comment but cannot edit. Then upgrade the share to Editor and verify status changes. Finally, revoke access.</p>
+<p><strong>Teaching warning:</strong> The simple existing authentication table stores passwords in plain text; use made-up practice passwords only. Keep the MySQL query console confined to a disposable teaching database.</p>
+</section>
 <section class="card" id="try-connection"><span class="tag">Real backend connection lab</span><h2>Connect to your published GoDaddy API</h2>
 <p>The practice buttons use the <strong>published</strong> GoDaddy Node.js API below. If its proxy blocks CORS, the course tries a JSONP fallback for these public, read-only programs; never use JSONP for private data. GoDaddy preview links are private and can block public browser requests. To update the server, click <strong>Update Preview</strong> and then <strong>Publish to Live</strong> in GoDaddy. Do not include any preview sharing token.</p>
 <div class="api-line"><div class="form-field"><label for="api-url">GoDaddy API base URL</label><input type="url" id="api-url" placeholder="https://snode.learnwithchampak.live" autocomplete="url"></div><button id="connect-api" type="button" class="button primary">Connect &amp; test</button><button id="api-reset" type="button" class="button">Reset URL</button></div>
@@ -474,6 +494,6 @@ console.log(tasks);</code></pre></div>
 <a href="#ch17">17. HTML Form to Node.js</a>
 <a href="#ch18">18. Deploy on GoDaddy + CORS</a>
 <a href="#ch19">19. Build a Task Manager</a>
-<a href="#ch20">20. Infinity: REST API and Database</a><a href="#try-connection">GoDaddy API lab</a></div></aside></div>
+<a href="#ch20">20. Infinity: REST API and Database</a><a href="#taskmanager-v2">Full-Stack Task Manager V2</a><a href="#try-connection">GoDaddy API lab</a></div></aside></div>
 </div><footer><div class="wrap">Programmer's Picnic · Developed and maintained by Champak Roy · <a href="../index.html">NodeUse home</a> · <a href="https://dsa.learnwithchampak.live/">DSA lessons</a> · <a href="https://editor.learnwithchampak.live/">Code editor</a></div></footer>
 <script defer src="../assets/jsonp.js"></script><script defer src="../assets/app.js"></script><script defer src="../assets/lesson-demos.js"></script></body></html>
