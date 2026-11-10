@@ -20,7 +20,7 @@ footer{text-align:center;padding:20px;font-size:13px;color:#587189}
 <header><div class="wrap">
 <h1>NodeUse — Learn Node.js by doing</h1>
 <p>Express.js · EJS templates · MySQL · Registration, login, sessions and SQL practice</p>
-<div class="nav"><a href="/hello">Hello EJS</a><a href="/register">Register</a><a href="/login">Login</a><a href="/protected">Protected</a><a href="/logout">Logout</a><a href="/mysql-console">SQL Console</a></div>
+<div class="nav"><a href="/tasks">Task Manager</a><a href="/tasks/shared">Shared With Me</a><a href="/hello">Hello EJS</a><a href="/register">Register</a><a href="/login">Login</a><a href="/protected">Protected</a><a href="/logout">Logout</a><a href="/mysql-console">SQL Console</a></div>
 </div></header>
 <main class="wrap">
 <% if (user) { %>
@@ -30,6 +30,9 @@ footer{text-align:center;padding:20px;font-size:13px;color:#587189}
 <% } %>
 <h2>All NodeUse application URLs</h2>
 <div class="grid">
+<a class="card" href="/tasks"><strong>/tasks — Collaborative Task Manager</strong><span>Create, edit, search, filter, complete and share MySQL tasks; add comments and manage permissions.</span></a>
+<a class="card" href="/tasks/new"><strong>/tasks/new — New Task</strong><span>Create a task with due date, description, priority and status.</span></a>
+<a class="card" href="/tasks/shared"><strong>/tasks/shared — Shared With Me</strong><span>See tasks other students have shared with you.</span></a>
 <a class="card" href="/hello"><strong>/hello — EJS demo</strong><span>The original cricketers array displayed by hello.ejs, unchanged.</span></a>
 <a class="card" href="/register"><strong>/register — Register</strong><span>Insert a student into the three-field MySQL register table.</span></a>
 <a class="card" href="/login"><strong>/login — Login</strong><span>Look up a student in MySQL and start a browser session.</span></a>
