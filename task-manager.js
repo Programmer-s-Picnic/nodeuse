@@ -47,7 +47,7 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
     const q=text(req.query.q).slice(0,120).toLowerCase();
     let tasks=rows.filter(t => (view==="all" || (view==="mine" ? t.username===username : t.username!==username)) && (!status || t.status===status) && (!priority || t.priority===priority) && (!q || (t.title+" "+(t.description||"")).toLowerCase().includes(q)));
     const sort=["updated","due","priority"].includes(req.query.sort) ? req.query.sort : "updated";
-    if(sort==="due") tasks.sort((a,b) => String(a.duedate||"9999").localeCompare(String(b.duedate||"9999")));
+    if(sort==="due") tasks.sort((a,b) => (a.duedate ? new Date(a.duedate).getTime() : Number.MAX_SAFE_INTEGER) - (b.duedate ? new Date(b.duedate).getTime() : Number.MAX_SAFE_INTEGER));
     if(sort==="priority") tasks.sort((a,b) => priorities.indexOf(b.priority)-priorities.indexOf(a.priority));
     const counts={total:rows.length,mine:rows.filter(t=>t.username===username).length,shared:rows.filter(t=>t.username!==username).length,pending:rows.filter(t=>t.status==="Pending").length,completed:rows.filter(t=>t.status==="Completed").length};
     res.render("task-dashboard",{tasks,counts,user:req.user,view,status,priority,q,sort,csrf:csrf(req,res)});
