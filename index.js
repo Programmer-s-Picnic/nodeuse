@@ -44,9 +44,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// Educational example: sessions are stored in server memory, not in the register table.
-// Restarting the server logs users out. Do not use this session store for a
-// real, multi-instance production application.
 const sessions = new Map();
 const SESSION_MS = 8 * 60 * 60 * 1000;
 const loginAttempts = new Map();
