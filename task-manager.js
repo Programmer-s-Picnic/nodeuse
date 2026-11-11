@@ -103,12 +103,12 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
     return value.replace("T"," ") + ":00";
   };
   function taskValues(req) {
-    const title = text(req.body.title), description = text(req.body.description);
+    const title = text(req.body.title);
     const status = text(req.body.status) || "Pending";
     const priority = text(req.body.priority) || "Medium";
     const duedate = taskDate(text(req.body.duedate));
-    if (!title || title.length > 200 || description.length > 4000 || !statuses.includes(status) || !priorities.includes(priority) || duedate === undefined) return null;
-    return {title,description,status,priority,duedate};
+    if (!title || title.length > 200 || !statuses.includes(status) || !priorities.includes(priority) || duedate === undefined) return null;
+    return {title,status,priority,duedate};
   }
   app.get("/tasks/shared", requireLogin, (req,res) => res.redirect("/tasks?view=shared"));
   app.get("/tasks", requireLogin, ready, wrap(async (req,res) => {
@@ -118,7 +118,7 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
     const status=statuses.includes(req.query.status) ? req.query.status : "";
     const priority=priorities.includes(req.query.priority) ? req.query.priority : "";
     const q=text(req.query.q).slice(0,120).toLowerCase();
-    let tasks=rows.filter(t => (view==="all" || (view==="mine" ? t.username===username : t.username!==username)) && (!status || t.status===status) && (!priority || t.priority===priority) && (!q || (t.title+" "+(t.description||"")).toLowerCase().includes(q)));
+    let tasks=rows.filter(t => (view==="all" || (view==="mine" ? t.username===username : t.username!==username)) && (!status || t.status===status) && (!priority || t.priority===priority) && (!q || t.title.toLowerCase().includes(q)));
     const sort=["updated","due","priority"].includes(req.query.sort) ? req.query.sort : "updated";
     if(sort==="due") tasks.sort((a,b) => (a.duedate ? new Date(a.duedate).getTime() : Number.MAX_SAFE_INTEGER) - (b.duedate ? new Date(b.duedate).getTime() : Number.MAX_SAFE_INTEGER));
     if(sort==="priority") tasks.sort((a,b) => priorities.indexOf(b.priority)-priorities.indexOf(a.priority));
@@ -129,7 +129,7 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
   app.post("/tasks/new", requireLogin, csrfCheck, ready, wrap(async (req,res) => {
     const v=taskValues(req);
     if (!v) return res.status(400).render("task-form",{task:req.body,csrf:csrf(req,res),error:"Enter a title (up to 200 characters), valid priority/status, and optional date."});
-    const [result] = await dbPool.execute("INSERT INTO nodeuse_tasks (username,title,description,priority,status,duedate) VALUES (?,?,?,?,?,?)",[req.user.username,v.title,v.description,v.priority,v.status,v.duedate]);
+    const [result] = await dbPool.execute("INSERT INTO nodeuse_tasks (username,title,priority,status,duedate) VALUES (?,?,?,?,?)",[req.user.username,v.title,v.priority,v.status,v.duedate]);
     res.redirect("/tasks/"+result.insertId);
   }));
   // Static paths must be registered before dynamic /tasks/:id.
@@ -145,7 +145,7 @@ function installTasks(app, { dbPool, registerTableReady, requireLogin, csrfCheck
     const task=await access(id,req.user.username);if(!task)return errorPage(res,"Task not found.",404);
     if(!canEdit(task,req.user.username))return errorPage(res,"View-only access.",403);
     const v=taskValues(req);if(!v)return res.status(400).render("task-form",{task:{...task,...req.body},csrf:csrf(req,res),error:"Please correct the task details."});
-    await dbPool.execute("UPDATE nodeuse_tasks SET title=?,description=?,priority=?,status=?,duedate=? WHERE taskid=?",[v.title,v.description,v.priority,v.status,v.duedate,id]);
+    await dbPool.execute("UPDATE nodeuse_tasks SET title=?,priority=?,status=?,duedate=? WHERE taskid=?",[v.title,v.priority,v.status,v.duedate,id]);
     res.redirect("/tasks/"+id);
   }));
   app.post("/tasks/:id/delete",requireLogin,csrfCheck,ready,wrap(async(req,res)=>{
