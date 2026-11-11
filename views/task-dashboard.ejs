@@ -77,9 +77,7 @@
                                 <%= (task.description||"No description").slice(0,170) %>
                             </p>
                             <div class="info"><span>
-                                    <%= task.username===user.username?"Owned by you":"Owned
-                                        by "+task.username %></span><span><%= task.username===user.username?"
-                                        Owner":task.permission %>
+                                    <%= task.username===user.username?"Owned by you":"Owned by "+task.username %></span><span><%= task.username===user.username?"Owner":task.permission %>
                                 </span></div>
                             <div class="info"><span>💬 <%= task.comment_count %> comments</span><span>👥 <%=
                                         task.share_count %> shared</span></div>
