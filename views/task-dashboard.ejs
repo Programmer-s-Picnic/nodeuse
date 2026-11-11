@@ -1,33 +1,93 @@
 <%- include("task-head",{title:"My Task Manager"}) %>
-<section class="hero"><div><p class="eyebrow">TASK MANAGER / COLLABORATION</p><h1>Hello, <%= user.name %></h1><p>Organize your work, share tasks, and discuss progress with other students.</p></div><a class="btn primary" href="/tasks/new">+ New Task</a></section>
-<section class="stats" aria-label="Task summary">
-<div class="stat"><small>Total accessible</small><strong><%= counts.total %></strong></div>
-<div class="stat"><small>Owned by me</small><strong><%= counts.mine %></strong></div>
-<div class="stat"><small>Shared with me</small><strong><%= counts.shared %></strong></div>
-<div class="stat"><small>Pending</small><strong><%= counts.pending %></strong></div>
-<div class="stat"><small>Completed</small><strong><%= counts.completed %></strong></div>
-</section>
-<section class="panel"><h2>Find tasks</h2>
-<div class="tabs"><a class="<%= view==='all'?'selected':'' %>" href="/tasks?view=all">All accessible</a><a class="<%= view==='mine'?'selected':'' %>" href="/tasks?view=mine">My tasks</a><a class="<%= view==='shared'?'selected':'' %>" href="/tasks?view=shared">Shared with me</a></div>
-<form method="get" action="/tasks" class="filters">
-<input type="hidden" name="view" value="<%= view %>">
-<label>Search<input type="search" name="q" value="<%= q %>" placeholder="Title or description"></label>
-<label>Status<select name="status"><option value="">All statuses</option><% ["Pending","In Progress","Completed"].forEach(s=>{ %><option value="<%= s %>" <%= status===s?'selected':'' %>><%= s %></option><% }) %></select></label>
-<label>Priority<select name="priority"><option value="">All priorities</option><% ["Low","Medium","High"].forEach(s=>{ %><option value="<%= s %>" <%= priority===s?'selected':'' %>><%= s %></option><% }) %></select></label>
-<label>Sort<select name="sort"><option value="updated" <%= sort==='updated'?'selected':'' %>>Recently updated</option><option value="due" <%= sort==='due'?'selected':'' %>>Due date</option><option value="priority" <%= sort==='priority'?'selected':'' %>>Priority</option></select></label>
-<button class="btn primary" type="submit">Apply</button></form></section>
-<section class="panel"><div class="sectiontitle"><h2>Tasks <small>(<%= tasks.length %>)</small></h2><a href="/tasks/new" class="btn">Add task</a></div>
-<% if(!tasks.length){ %><div class="empty">No tasks match your filters. <a href="/tasks/new">Create your first task</a>.</div><% } %>
-<div class="taskgrid">
-<% tasks.forEach(task=>{ %>
-<article class="taskcard">
-<div class="meta"><span class="pill <%= task.status==='Completed'?'completed':task.status==='In Progress'?'progress':'pending' %>"><%= task.status %></span><span class="pill"><%= task.priority %> priority</span></div>
-<h3><a href="/tasks/<%= task.taskid %>"><%= task.title %></a></h3>
-<p><%= (task.description||"No description").slice(0,170) %></p>
-<div class="info"><span><%= task.username===user.username?"Owned by you":"Owned by "+task.username %></span><span><%= task.username===user.username?"Owner":task.permission %></span></div>
-<div class="info"><span>💬 <%= task.comment_count %> comments</span><span>👥 <%= task.share_count %> shared</span></div>
-<div class="info"><span>Due: <%= task.duedate ? new Date(task.duedate).toLocaleDateString("en-IN"): "Not set" %></span></div>
-<a class="btn small" href="/tasks/<%= task.taskid %>">Open task</a>
-</article><% }); %>
-</div></section>
-<%- include("task-foot") %>
+    <section class="hero">
+        <div>
+            <p class="eyebrow">TASK MANAGER / COLLABORATION</p>
+            <h1>Hello, <%= user.name %>
+            </h1>
+            <p>Organize your work, share tasks, and discuss progress with other students.</p>
+        </div><a class="btn primary" href="/tasks/new">+ New Task</a>
+    </section>
+    <section class="stats" aria-label="Task summary">
+        <div class="stat"><small>Total accessible</small><strong>
+                <%= counts.total %>
+            </strong></div>
+        <div class="stat"><small>Owned by me</small><strong>
+                <%= counts.mine %>
+            </strong></div>
+        <div class="stat"><small>Shared with me</small><strong>
+                <%= counts.shared %>
+            </strong></div>
+        <div class="stat"><small>Pending</small><strong>
+                <%= counts.pending %>
+            </strong></div>
+        <div class="stat"><small>Completed</small><strong>
+                <%= counts.completed %>
+            </strong></div>
+    </section>
+    <section class="panel">
+        <h2>Find tasks</h2>
+        <div class="tabs"><a class="<%= view==='all'?'selected':'' %>" href="/tasks?view=all">All accessible</a><a
+                class="<%= view==='mine'?'selected':'' %>" href="/tasks?view=mine">My tasks</a><a
+                class="<%= view==='shared'?'selected':'' %>" href="/tasks?view=shared">Shared with me</a></div>
+        <form method="get" action="/tasks" class="filters">
+            <input type="hidden" name="view" value="<%= view %>">
+            <label>Search<input type="search" name="q" value="<%= q %>" placeholder="Title or description"></label>
+            <label>Status<select name="status">
+                    <option value="">All statuses</option>
+                    <% ["Pending","In Progress","Completed"].forEach(s=>{ %><option value="<%= s %>"
+                            <%=status===s?'selected':'' %>><%= s %>
+                        </option>
+                        <% }) %>
+                </select></label>
+            <label>Priority<select name="priority">
+                    <option value="">All priorities</option>
+                    <% ["Low","Medium","High"].forEach(s=>{ %><option value="<%= s %>" <%=priority===s?'selected':'' %>>
+                            <%= s %>
+                        </option>
+                        <% }) %>
+                </select></label>
+            <label>Sort<select name="sort">
+                    <option value="updated" <%=sort==='updated' ?'selected':'' %>>Recently updated</option>
+                    <option value="due" <%=sort==='due' ?'selected':'' %>>Due date</option>
+                    <option value="priority" <%=sort==='priority' ?'selected':'' %>>Priority</option>
+                </select></label>
+            <button class="btn primary" type="submit">Apply</button>
+        </form>
+    </section>
+    <section class="panel">
+        <div class="sectiontitle">
+            <h2>Tasks <small>(<%= tasks.length %>)</small></h2><a href="/tasks/new" class="btn">Add task</a>
+        </div>
+        <% if(!tasks.length){ %>
+            <div class="empty">No tasks match your filters. <a href="/tasks/new">Create your first task</a>.</div>
+            <% } %>
+                <div class="taskgrid">
+                    <% tasks.forEach(task=>{ %>
+                        <article class="taskcard">
+                            <div class="meta"><span
+                                    class="pill <%= task.status==='Completed'?'completed':task.status==='In Progress'?'progress':'pending' %>">
+                                    <%= task.status %>
+                                </span><span class="pill">
+                                    <%= task.priority %> priority
+                                </span></div>
+                            <h3><a href="/tasks/<%= task.taskid %>">
+                                    <%= task.title %>
+                                </a></h3>
+                            <p>
+                                <%= (task.description||"No description").slice(0,170) %>
+                            </p>
+                            <div class="info"><span>
+                                    <%= task.username===user.username?"Owned by you":"Owned
+                                        by "+task.username %></span><span><%= task.username===user.username?"
+                                        Owner":task.permission %>
+                                </span></div>
+                            <div class="info"><span>💬 <%= task.comment_count %> comments</span><span>👥 <%=
+                                        task.share_count %> shared</span></div>
+                            <div class="info"><span>Due: <%= task.duedate ? new
+                                        Date(task.duedate).toLocaleDateString("en-IN"): "Not set" %></span></div>
+                            <a class="btn small" href="/tasks/<%= task.taskid %>">Open task</a>
+                        </article>
+                        <% }); %>
+                </div>
+    </section>
+    <%- include("task-foot") %>

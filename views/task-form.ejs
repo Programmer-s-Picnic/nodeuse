@@ -1,16 +1,47 @@
 <%- include("task-head",{title:task&&task.taskid?"Edit Task":"New Task"}) %>
-<section class="hero"><div><p class="eyebrow"><a href="/tasks">TASKS</a> / <%= task&&task.taskid?"EDIT":"NEW" %></p><h1><%= task&&task.taskid?"Edit task":"Create a task" %></h1><p>Set a title, description, due date, priority and status.</p></div></section>
-<div class="panel narrow">
-<% if(error){ %><div class="alert" role="alert"><%= error %></div><% } %>
-<form method="post" action="<%= task&&task.taskid?'/tasks/'+task.taskid+'/edit':'/tasks/new' %>" class="taskform">
-<input type="hidden" name="csrf" value="<%= csrf %>">
-<label>Task title <input name="title" maxlength="200" required value="<%= task?task.title||'':'' %>" placeholder="Prepare Node.js assignment"></label>
-<label>Description <textarea name="description" maxlength="4000" rows="6" placeholder="Describe the task"><%= task?task.description||'':'' %></textarea></label>
-<div class="formgrid">
-<label>Priority<select name="priority"><% ["Low","Medium","High"].forEach(s=>{ %><option value="<%= s %>" <%= (task&&task.priority||'Medium')===s?'selected':'' %>><%= s %></option><% }) %></select></label>
-<label>Status<select name="status"><% ["Pending","In Progress","Completed"].forEach(s=>{ %><option value="<%= s %>" <%= (task&&task.status||'Pending')===s?'selected':'' %>><%= s %></option><% }) %></select></label>
-</div>
-<label>Due date and time (optional) <input type="datetime-local" name="duedate" value="<%= task&&task.duedate ? (typeof task.duedate==='string'?task.duedate.replace(' ','T').slice(0,16):new Date(task.duedate).toISOString().slice(0,16)):'' %>"></label>
-<div class="actions"><button class="btn primary" type="submit"><%= task&&task.taskid?"Save changes":"Create task" %></button><a class="btn" href="<%= task&&task.taskid?'/tasks/'+task.taskid:'/tasks' %>">Cancel</a></div>
-</form></div>
-<%- include("task-foot") %>
+    <section class="hero">
+        <div>
+            <p class="eyebrow"><a href="/tasks">TASKS</a> / <%= task&&task.taskid?"EDIT":"NEW" %>
+            </p>
+            <h1>
+                <%= task&&task.taskid?"Edit task":"Create a task" %>
+            </h1>
+            <p>Set a title, description, due date, priority and status.</p>
+        </div>
+    </section>
+    <div class="panel narrow">
+        <% if(error){ %>
+            <div class="alert" role="alert">
+                <%= error %>
+            </div>
+            <% } %>
+                <form method="post" action="<%= task&&task.taskid?'/tasks/'+task.taskid+'/edit':'/tasks/new' %>"
+                    class="taskform">
+                    <input type="hidden" name="csrf" value="<%= csrf %>">
+                    <label>Task title <input name="title" maxlength="200" required value="<%= task?task.title||'':'' %>"
+                            placeholder="Prepare Node.js assignment"></label>
+                    <label>Description <textarea name="description" maxlength="4000" rows="6"
+                            placeholder="Describe the task"><%= task?task.description||'':'' %></textarea></label>
+                    <div class="formgrid">
+                        <label>Priority<select name="priority">
+                                <% ["Low","Medium","High"].forEach(s=>{ %><option value="<%= s %>"
+                                        <%=(task&&task.priority||'Medium')===s?'selected':'' %>><%= s %>
+                                    </option>
+                                    <% }) %>
+                            </select></label>
+                        <label>Status<select name="status">
+                                <% ["Pending","In Progress","Completed"].forEach(s=>{ %><option value="<%= s %>"
+                                        <%=(task&&task.status||'Pending')===s?'selected':'' %>><%= s %>
+                                    </option>
+                                    <% }) %>
+                            </select></label>
+                    </div>
+                    <label>Due date and time (optional) <input type="datetime-local" name="duedate"
+                            value="<%= task&&task.duedate ? (typeof task.duedate==='string'?task.duedate.replace(' ','T').slice(0,16):new Date(task.duedate).toISOString().slice(0,16)):'' %>"></label>
+                    <div class="actions"><button class="btn primary" type="submit">
+                            <%= task&&task.taskid?"Save changes":"Create task" %>
+                        </button><a class="btn"
+                            href="<%= task&&task.taskid?'/tasks/'+task.taskid:'/tasks' %>">Cancel</a></div>
+                </form>
+    </div>
+    <%- include("task-foot") %>

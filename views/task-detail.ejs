@@ -1,26 +1,119 @@
 <%- include("task-head",{title:task.title}) %>
-<section class="hero"><div><p class="eyebrow"><a href="/tasks">TASKS</a> / TASK #<%= task.taskid %></p><h1><%= task.title %></h1><p>Owned by <strong><%= task.username %></strong> · Your access: <%= owner?"Owner":task.permission %></p></div><div class="actions"><% if(editor){ %><a class="btn primary" href="/tasks/<%= task.taskid %>/edit">Edit task</a><% } %><a class="btn" href="/tasks">Back to tasks</a></div></section>
-<section class="panel"><div class="meta"><span class="pill <%= task.status==='Completed'?'completed':task.status==='In Progress'?'progress':'pending' %>"><%= task.status %></span><span class="pill"><%= task.priority %> priority</span></div><h2>Details</h2><p class="description"><%= task.description||"No description provided." %></p>
-<div class="info"><span>Due: <%= task.duedate?new Date(task.duedate).toLocaleString("en-IN"):"Not set" %></span><span>Created: <%= new Date(task.createdat).toLocaleString("en-IN") %></span></div>
-<% if(editor){ %>
-<form class="inlineform" method="post" action="/tasks/<%= task.taskid %>/status"><input type="hidden" name="csrf" value="<%= csrf %>"><label>Change status <select name="status"><% ["Pending","In Progress","Completed"].forEach(s=>{ %><option value="<%= s %>" <%= task.status===s?'selected':'' %>><%= s %></option><% }) %></select></label><button type="submit" class="btn">Update status</button></form>
-<% } %><% if(owner){ %>
-<form method="post" action="/tasks/<%= task.taskid %>/delete" onsubmit="return confirm('Permanently delete this task and all its shares and comments?')"><input type="hidden" name="csrf" value="<%= csrf %>"><button type="submit" class="btn danger">Delete task</button></form>
-<% } %>
-</section>
-<section class="panel" id="sharing"><div class="sectiontitle"><h2>Shared users (<%= shares.length %>)</h2></div>
-<% if(!shares.length){ %><p class="muted">This task is not shared with anyone yet.</p><% } %>
-<div class="entries"><% shares.forEach(share=>{ %><div class="entry"><div><strong><%= share.name %> (<%= share.sharedwith %>)</strong><p class="muted"><%= share.permission %> · Shared <%= new Date(share.sharedat).toLocaleDateString("en-IN") %></p></div>
-<% if(owner){ %><form method="post" action="/tasks/<%= task.taskid %>/unshare"><input type="hidden" name="csrf" value="<%= csrf %>"><input type="hidden" name="sharedwith" value="<%= share.sharedwith %>"><button class="btn small danger" type="submit">Revoke access</button></form><% } %></div><% }) %></div>
-<% if(owner){ %><h3>Share with a registered student</h3>
-<form method="post" class="inlineform" action="/tasks/<%= task.taskid %>/share"><input type="hidden" name="csrf" value="<%= csrf %>"><label>Username<input name="sharedwith" maxlength="40" required placeholder="e.g. Sunny"></label><label>Permission<select name="permission"><option value="Viewer">Viewer — read and comment</option><option value="Editor">Editor — edit, change status, comment</option></select></label><button class="btn primary" type="submit">Share task</button></form>
-<% } %></section>
-<section class="panel" id="comments"><div class="sectiontitle"><h2>Discussion (<%= comments.length %>)</h2></div>
-<% if(!comments.length){ %><p class="muted">No comments yet. Start the conversation.</p><% } %>
-<div class="entries"><% comments.forEach(comment=>{ %>
-<div class="entry"><div><strong><%= comment.name %> (<%= comment.username %>)</strong> <small class="muted"><%= new Date(comment.createdat).toLocaleString("en-IN") %></small><p class="comment"><%= comment.commenttext %></p></div>
-<% if(owner||comment.username===user.username){ %><form method="post" action="/tasks/<%= task.taskid %>/comments/<%= comment.commentid %>/delete" onsubmit="return confirm('Delete this comment?')"><input type="hidden" name="csrf" value="<%= csrf %>"><button class="btn small danger" type="submit">Delete</button></form><% } %></div>
-<% }) %></div>
-<form method="post" action="/tasks/<%= task.taskid %>/comments" class="taskform"><input type="hidden" name="csrf" value="<%= csrf %>"><label>Add a comment<textarea name="commenttext" rows="3" maxlength="2000" required placeholder="Share an update, ask a question, or give feedback"></textarea></label><button class="btn primary" type="submit">Post comment</button></form>
-</section>
-<%- include("task-foot") %>
+    <section class="hero">
+        <div>
+            <p class="eyebrow"><a href="/tasks">TASKS</a> / TASK #<%= task.taskid %>
+            </p>
+            <h1>
+                <%= task.title %>
+            </h1>
+            <p>Owned by <strong>
+                    <%= task.username %>
+                </strong> · Your access: <%= owner?"Owner":task.permission %>
+            </p>
+        </div>
+        <div class="actions">
+            <% if(editor){ %><a class="btn primary" href="/tasks/<%= task.taskid %>/edit">Edit task</a>
+                <% } %><a class="btn" href="/tasks">Back to tasks</a>
+        </div>
+    </section>
+    <section class="panel">
+        <div class="meta"><span
+                class="pill <%= task.status==='Completed'?'completed':task.status==='In Progress'?'progress':'pending' %>">
+                <%= task.status %>
+            </span><span class="pill">
+                <%= task.priority %> priority
+            </span></div>
+        <h2>Details</h2>
+        <p class="description">
+            <%= task.description||"No description provided." %>
+        </p>
+        <div class="info"><span>Due: <%= task.duedate?new Date(task.duedate).toLocaleString("en-IN"):"Not set" %>
+                    </span><span>Created: <%= new Date(task.createdat).toLocaleString("en-IN") %></span></div>
+        <% if(editor){ %>
+            <form class="inlineform" method="post" action="/tasks/<%= task.taskid %>/status"><input type="hidden"
+                    name="csrf" value="<%= csrf %>"><label>Change status <select name="status">
+                        <% ["Pending","In Progress","Completed"].forEach(s=>{ %><option value="<%= s %>"
+                                <%=task.status===s?'selected':'' %>><%= s %>
+                            </option>
+                            <% }) %>
+                    </select></label><button type="submit" class="btn">Update status</button></form>
+            <% } %>
+                <% if(owner){ %>
+                    <form method="post" action="/tasks/<%= task.taskid %>/delete"
+                        onsubmit="return confirm('Permanently delete this task and all its shares and comments?')">
+                        <input type="hidden" name="csrf" value="<%= csrf %>"><button type="submit"
+                            class="btn danger">Delete task</button></form>
+                    <% } %>
+    </section>
+    <section class="panel" id="sharing">
+        <div class="sectiontitle">
+            <h2>Shared users (<%= shares.length %>)</h2>
+        </div>
+        <% if(!shares.length){ %>
+            <p class="muted">This task is not shared with anyone yet.</p>
+            <% } %>
+                <div class="entries">
+                    <% shares.forEach(share=>{ %><div class="entry">
+                            <div><strong>
+                                    <%= share.name %> (<%= share.sharedwith %>)
+                                </strong>
+                                <p class="muted">
+                                    <%= share.permission %> · Shared <%= new
+                                            Date(share.sharedat).toLocaleDateString("en-IN") %>
+                                </p>
+                            </div>
+                            <% if(owner){ %>
+                                <form method="post" action="/tasks/<%= task.taskid %>/unshare"><input type="hidden"
+                                        name="csrf" value="<%= csrf %>"><input type="hidden" name="sharedwith"
+                                        value="<%= share.sharedwith %>"><button class="btn small danger"
+                                        type="submit">Revoke access</button></form>
+                                <% } %>
+                        </div>
+                        <% }) %>
+                </div>
+                <% if(owner){ %>
+                    <h3>Share with a registered student</h3>
+                    <form method="post" class="inlineform" action="/tasks/<%= task.taskid %>/share"><input type="hidden"
+                            name="csrf" value="<%= csrf %>"><label>Username<input name="sharedwith" maxlength="40"
+                                required placeholder="e.g. Sunny"></label><label>Permission<select name="permission">
+                                <option value="Viewer">Viewer — read and comment</option>
+                                <option value="Editor">Editor — edit, change status, comment</option>
+                            </select></label><button class="btn primary" type="submit">Share task</button></form>
+                    <% } %>
+    </section>
+    <section class="panel" id="comments">
+        <div class="sectiontitle">
+            <h2>Discussion (<%= comments.length %>)</h2>
+        </div>
+        <% if(!comments.length){ %>
+            <p class="muted">No comments yet. Start the conversation.</p>
+            <% } %>
+                <div class="entries">
+                    <% comments.forEach(comment=>{ %>
+                        <div class="entry">
+                            <div><strong>
+                                    <%= comment.name %> (<%= comment.username %>)
+                                </strong> <small class="muted">
+                                    <%= new Date(comment.createdat).toLocaleString("en-IN") %>
+                                </small>
+                                <p class="comment">
+                                    <%= comment.commenttext %>
+                                </p>
+                            </div>
+                            <% if(owner||comment.username===user.username){ %>
+                                <form method="post"
+                                    action="/tasks/<%= task.taskid %>/comments/<%= comment.commentid %>/delete"
+                                    onsubmit="return confirm('Delete this comment?')"><input type="hidden" name="csrf"
+                                        value="<%= csrf %>"><button class="btn small danger"
+                                        type="submit">Delete</button></form>
+                                <% } %>
+                        </div>
+                        <% }) %>
+                </div>
+                <form method="post" action="/tasks/<%= task.taskid %>/comments" class="taskform"><input type="hidden"
+                        name="csrf" value="<%= csrf %>"><label>Add a comment<textarea name="commenttext" rows="3"
+                            maxlength="2000" required
+                            placeholder="Share an update, ask a question, or give feedback"></textarea></label><button
+                        class="btn primary" type="submit">Post comment</button></form>
+    </section>
+    <%- include("task-foot") %>
